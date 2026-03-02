@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Universe - The Future of Web3</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; overflow-x: hidden; }
+
+        /* हेडर सेटिंग */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 30px; background-color: #151a25; border-bottom: 1px solid #2a2f3a;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 20px; }
+        .logo img { height: 40px; margin-right: 12px; }
+        
+        .auth-buttons { display: flex; gap: 12px; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 10px 22px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-weight: bold;}
+        .login-btn:hover { background: #2a2f3a; }
+        .register-btn { background: #f3ba2f; color: #000; border: none; padding: 10px 22px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-weight: bold; }
+        .register-btn:hover { background: #e5a920; transform: scale(1.05); }
+
+        /* प्रीमियम स्लाइडर */
+        .hero-slider-container {
+            position: relative; width: 100%; height: 500px; 
+            overflow: hidden; background-color: #0b0e14;
+        }
+        .slider-wrapper {
+            display: flex; width: 400%; height: 100%; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .slide {
+            width: 25%; height: 100%; display: flex; align-items: center; justify-content: center;
+            text-align: center; position: relative; padding: 0 20px;
+        }
+        
+        /* 🚀 प्रीमियम 3D बैकग्राउंड्स 🚀 */
+        .bg-invest { background: linear-gradient(rgba(11, 14, 20, 0.7), rgba(11, 14, 20, 0.9)), url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80') center/cover; }
+        .bg-matrix { background: linear-gradient(rgba(11, 14, 20, 0.7), rgba(11, 14, 20, 0.9)), url('https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&w=1200&q=80') center/cover; }
+        .bg-game { background: linear-gradient(rgba(11, 14, 20, 0.7), rgba(11, 14, 20, 0.9)), url('https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&w=1200&q=80') center/cover; }
+        .bg-nft { background: linear-gradient(rgba(11, 14, 20, 0.7), rgba(11, 14, 20, 0.9)), url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&w=1200&q=80') center/cover; }
+
+        .slide-content { max-width: 850px; z-index: 3; }
+        .slide-title { font-size: 48px; color: #fff; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 5px 20px #000; }
+        .slide-title span { color: #f3ba2f; }
+        .slide-desc { font-size: 18px; color: #cbd5e0; margin-bottom: 35px; line-height: 1.6; }
+        
+        .slide-btn {
+            background: #f3ba2f; color: #000; padding: 15px 40px; font-size: 16px; font-weight: bold;
+            border: none; border-radius: 30px; cursor: pointer; text-decoration: none;
+            transition: all 0.3s; box-shadow: 0 0 20px rgba(243, 186, 47, 0.4);
+        }
+        .slide-btn:hover { background: #e5a920; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 186, 47, 0.6); }
+
+        .slider-dots {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 12px; z-index: 10;
+        }
+        .dot { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.3s; }
+        .dot.active { background: #f3ba2f; transform: scale(1.4); box-shadow: 0 0 15px #f3ba2f; }
+
+        /* फीचर्स सेक्शन */
+        .features-section { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; padding: 70px 20px; max-width: 1200px; margin: 0 auto; }
+        .feature-box { background: #151a25; border: 1px solid #2a2f3a; padding: 35px 25px; border-radius: 15px; width: 320px; text-align: center; transition: 0.4s; box-shadow: 0 10px 30px rgba(0,0,0,0.4);}
+        .feature-box:hover { border-color: #f3ba2f; transform: translateY(-10px); }
+        .feature-box i { font-size: 45px; margin-bottom: 20px; display: block; font-style: normal; }
+        .feature-box h3 { color: #fff; margin-bottom: 12px; font-size: 20px; }
+        .feature-box p { color: #a0a5b1; font-size: 14px; line-height: 1.6; }
+
+        @media(max-width: 768px) {
+            header { padding: 15px 20px; }
+            .logo span { display: none; }
+            .hero-slider-container { height: 420px; } 
+            .slide-title { font-size: 30px; }
+            .slide-desc { font-size: 15px; }
+            .feature-box { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Smart Universe Logo">
+            <span>SMART UNIVERSE</span>
+        </div>
+        <div class="auth-buttons">
+            <button class="login-btn" onclick="window.location.href='login.html'">Login</button>
+            <button class="register-btn" onclick="window.location.href='register.html'">Join Now</button>
+        </div>
+    </header>
+
+    <div class="hero-slider-container">
+        <div class="slider-wrapper" id="slider">
+            
+            <div class="slide bg-invest">
+                <div class="slide-content">
+                    <h1 class="slide-title">Stake & Earn <span>ROI</span></h1>
+                    <p class="slide-desc">Join the smartest staking ecosystem. Earn 3% to 12% monthly profit with USDT & SUC Tokens. Start building your digital wealth today.</p>
+                    <a href="register.html" class="slide-btn">Create Free Account</a>
+                </div>
+            </div>
+
+            <div class="slide bg-matrix">
+                <div class="slide-content">
+                    <h1 class="slide-title">100% <span>Matrix</span> System</h1>
+                    <p class="slide-desc">Experience the power of the S3 & S6 Classic Matrix. Automated spillover from Upline and massive rewards in SUC Tokens.</p>
+                    <a href="register.html" class="slide-btn" style="background:#00ff88;">Join the Matrix</a>
+                </div>
+            </div>
+
+            <div class="slide bg-game">
+                <div class="slide-content">
+                    <h1 class="slide-title">Live <span>Gaming</span> Zone</h1>
+                    <p class="slide-desc">Predict the market movements of BTC, SOL, and SUC. Play in 15s, 30s, or 60s rounds and double your tokens instantly!</p>
+                    <a href="register.html" class="slide-btn">Start Playing</a>
+                </div>
+            </div>
+
+            <div class="slide bg-nft">
+                <div class="slide-content">
+                    <h1 class="slide-title">Royalty <span>NFTs</span></h1>
+                    <p class="slide-desc">Achieve VIP status and mint exclusive SUC NFTs. Get a lifetime share of the Global Company Turnover Pool.</p>
+                    <a href="register.html" class="slide-btn" style="background:#00ff88;">Mint SUC NFT</a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="slider-dots">
+            <span class="dot active" onclick="goToSlide(0)"></span>
+            <span class="dot" onclick="goToSlide(1)"></span>
+            <span class="dot" onclick="goToSlide(2)"></span>
+            <span class="dot" onclick="goToSlide(3)"></span>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <div class="feature-box">
+            <i>🛡️</i>
+            <h3>Web3 Security</h3>
+            <p>Connect your Trust Wallet or MetaMask seamlessly. Your funds stay under your control with decentralized protocols.</p>
+        </div>
+        <div class="feature-box">
+            <i>💎</i>
+            <h3>SUC Token Utility</h3>
+            <p>SUC is the heart of our ecosystem. Use it for Matrix upgrades, Gaming bets, and staking to earn massive profits.</p>
+        </div>
+        <div class="feature-box">
+            <i>🚀</i>
+            <h3>Instant Payouts</h3>
+            <p>No more waiting for approvals. All matrix and gaming earnings are credited instantly to your internal wallet.</p>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 30px; border-top: 1px solid #2a2f3a; background: #0b0e14;">
+        <p style="color: #a0a5b1; font-size: 14px;">© 2026 Smart Universe (SUC). All rights reserved.</p>
+        <div style="margin-top: 10px; font-size: 12px; color: #4a5568;">
+            Decentralized Finance & Gaming Ecosystem
+        </div>
+    </footer>
+
+    <script>
+        let currentSlide = 0; const totalSlides = 4; const slider = document.getElementById('slider'); const dots = document.querySelectorAll('.dot'); let slideInterval;
+        function updateSlider() { slider.style.transform = `translateX(-${currentSlide * 25}%)`; dots.forEach(dot => dot.classList.remove('active')); dots[currentSlide].classList.add('active'); }
+        function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateSlider(); }
+        function goToSlide(index) { currentSlide = index; updateSlider(); resetInterval(); }
+        function startInterval() { slideInterval = setInterval(nextSlide, 5000); }
+        function resetInterval() { clearInterval(slideInterval); startInterval(); }
+        window.onload = startInterval;
+    </script>
+</body>
+</html>

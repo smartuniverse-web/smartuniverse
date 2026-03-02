@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Academy - Smart Universe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; }
+
+        /* हेडर */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .logo { display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px; }
+        .logo img { height: 35px; margin-right: 10px; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+
+        .container { max-width: 900px; margin: 30px auto; padding: 0 15px; }
+
+        .academy-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #2a2f3a; padding-bottom: 15px; flex-wrap: wrap; gap: 15px;}
+        .lang-btn { background: #151a25; color: #f3ba2f; border: 1px solid #f3ba2f; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .lang-btn:hover { background: #f3ba2f; color: #000; box-shadow: 0 0 15px rgba(243, 186, 47, 0.4);}
+
+        .guide-card { background: #151a25; border: 1px solid #2a2f3a; border-radius: 10px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #f3ba2f; box-shadow: 0 5px 15px rgba(0,0,0,0.3);}
+        .guide-card h3 { color: #fff; margin-bottom: 10px; font-size: 18px; }
+        .guide-card p { color: #a0a5b1; font-size: 14px; line-height: 1.6; margin-bottom: 10px;}
+        .guide-card ul { margin-left: 20px; color: #a0a5b1; font-size: 14px; line-height: 1.6; }
+        .guide-card ul li { margin-bottom: 5px; }
+        .highlight { color: #00ff88; font-weight: bold; }
+
+        /* Language Toggle Classes */
+        .lang-hi { display: none; } 
+        .lang-en { display: block; } 
+
+        /* Download Section Design */
+        .download-section { margin-top: 40px; border-top: 2px dashed #2a2f3a; padding-top: 30px; }
+        .download-section h2 { color: #f3ba2f; text-align: center; margin-bottom: 10px; font-size: 24px; }
+        .download-section p { text-align: center; color: #a0a5b1; font-size: 14px; margin-bottom: 25px; }
+        
+        .dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .dl-card { background: #0b0e14; border: 1px solid #2a2f3a; padding: 20px 15px; border-radius: 10px; text-align: center; transition: 0.3s; position: relative; overflow: hidden; }
+        .dl-card:hover { border-color: #f3ba2f; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .dl-icon { font-size: 35px; margin-bottom: 10px; }
+        .dl-title { color: #fff; font-size: 14px; font-weight: bold; margin-bottom: 5px; line-height: 1.4; height: 40px; }
+        .dl-format { color: #a0a5b1; font-size: 11px; margin-bottom: 15px; font-weight: bold; }
+        
+        .dl-btn { background: #2a2f3a; color: #fff; border: 1px solid #f3ba2f; padding: 10px; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
+        .dl-btn:hover { background: #f3ba2f; color: #000; }
+        
+        /* PDF and PPT colors */
+        .fmt-pdf { color: #ff4d4d; }
+        .fmt-ppt { color: #ff9900; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo"> 
+            SMART UNIVERSE <span style="font-size: 12px; color: #00ff88; margin-left: 5px;">(SUC)</span>
+        </div>
+        <button class="login-btn" onclick="window.location.href='dashboard.html'">Back</button>
+    </header>
+
+    <div class="container">
+        
+        <div class="academy-header">
+            <div>
+                <h2 style="color: #f3ba2f;" class="lang-en">📚 Smart Universe Academy</h2>
+                <h2 style="color: #f3ba2f;" class="lang-hi">📚 Smart Universe लर्निंग अकादमी</h2>
+                <p style="color: #a0a5b1; font-size: 14px;" class="lang-en">Master the Web3 Ecosystem & Maximize your Earnings.</p>
+                <p style="color: #a0a5b1; font-size: 14px;" class="lang-hi">Web3 इकोसिस्टम को समझें और अपनी कमाई को 100x बढ़ाएं।</p>
+            </div>
+            <button class="lang-btn" id="lang-toggle-btn" onclick="toggleLanguage()">🌐 Switch to Hindi</button>
+        </div>
+
+        <div class="guide-card">
+            <h3 class="lang-en">1. How to Start? (Deposit & Web3)</h3>
+            <h3 class="lang-hi">1. शुरुआत कैसे करें? (डिपॉजिट और Web3)</h3>
+            <div class="lang-en">
+                <p>To participate in the Smart Universe ecosystem, you need to add funds to your Main Wallet.</p>
+                <ul>
+                    <li>Click on <span class="highlight">"Connect Web3"</span> to link your Trust Wallet or MetaMask.</li>
+                    <li>Deposit USDT to start, and buy <span class="highlight">SUC Tokens</span> from the Presale box on your Dashboard.</li>
+                </ul>
+            </div>
+            <div class="lang-hi">
+                <p>Smart Universe इकोसिस्टम में भाग लेने के लिए, आपको अपने मेन वॉलेट में फंड डालना होगा।</p>
+                <ul>
+                    <li>Trust Wallet या MetaMask जोड़ने के लिए <span class="highlight">"Connect Web3"</span> पर क्लिक करें।</li>
+                    <li>शुरुआत के लिए USDT डिपॉजिट करें, और डैशबोर्ड से <span class="highlight">SUC Tokens</span> खरीदें।</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="guide-card" style="border-left-color: #00ff88;">
+            <h3 class="lang-en">2. The Classic Matrix & Auto-Upgrade</h3>
+            <h3 class="lang-hi">2. क्लासिक मैट्रिक्स और ऑटो-अपग्रेड</h3>
+            <div class="lang-en">
+                <p>The Classic Program is a 100% decentralized matrix (S3 & S6) that gives instant earnings.</p>
+                <ul>
+                    <li><span class="highlight">Auto-Upgrade:</span> Keep this "ON" so your matrix income is held in a smart wallet to automatically activate your next bigger slot.</li>
+                    <li>Unlocking Matrix Slots also unlocks the <span class="highlight">Stake & ROI Plans</span>!</li>
+                </ul>
+            </div>
+            <div class="lang-hi">
+                <p>क्लासिक प्रोग्राम 100% डिसेंट्रलाइज्ड मैट्रिक्स (S3 & S6) है जो आपको तुरंत कमाई देता है।</p>
+                <ul>
+                    <li><span class="highlight">ऑटो-अपग्रेड:</span> इसे "ON" रखें ताकि आपकी मैट्रिक्स की कमाई होल्ड होकर अपने-आप अगला बड़ा स्लॉट खोल दे।</li>
+                    <li>मैट्रिक्स स्लॉट खोलने से आपके <span class="highlight">Stake & ROI (इन्वेस्टमेंट) प्लान्स</span> भी अनलॉक हो जाते हैं!</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="download-section">
+            <h2 class="lang-en">📥 Presentation & Marketing Tools</h2>
+            <h2 class="lang-hi">📥 प्रेजेंटेशन और मार्केटिंग टूल्स</h2>
+            
+            <p class="lang-en">Download official PDFs and PPTs to educate your team and conduct Zoom meetings.</p>
+            <p class="lang-hi">अपनी टीम को सिखाने और ज़ूम मीटिंग (Zoom Meetings) लेने के लिए आधिकारिक PDF और PPT डाउनलोड करें।</p>
+            
+            <div class="dl-grid">
+                
+                <div class="dl-card">
+                    <div class="dl-icon">📄</div>
+                    <div class="dl-title">Smart Universe Business Plan</div>
+                    <div class="dl-format fmt-pdf">Format: PDF (5 MB)</div>
+                    <button class="dl-btn" onclick="fakeDownload('Smart_Universe_Business_Plan.pdf')">⬇ Download PDF</button>
+                </div>
+
+                <div class="dl-card">
+                    <div class="dl-icon">📊</div>
+                    <div class="dl-title">Smart Universe Business Plan</div>
+                    <div class="dl-format fmt-ppt">Format: Powerpoint (12 MB)</div>
+                    <button class="dl-btn" onclick="fakeDownload('Smart_Universe_Business_Plan.pptx')">⬇ Download PPT</button>
+                </div>
+
+                <div class="dl-card">
+                    <div class="dl-icon">⭐</div>
+                    <div class="dl-title">Classic Matrix (S3 & S6) Deep Dive</div>
+                    <div class="dl-format fmt-ppt">Format: Powerpoint (8 MB)</div>
+                    <button class="dl-btn" onclick="fakeDownload('SUC_Matrix_Plan.pptx')">⬇ Download PPT</button>
+                </div>
+
+                <div class="dl-card">
+                    <div class="dl-icon">💰</div>
+                    <div class="dl-title">Stake & ROI Earn Strategy</div>
+                    <div class="dl-format fmt-ppt">Format: Powerpoint (6 MB)</div>
+                    <button class="dl-btn" onclick="fakeDownload('SUC_Stake_ROI_Strategy.pptx')">⬇ Download PPT</button>
+                </div>
+
+                <div class="dl-card">
+                    <div class="dl-icon">🖼️</div>
+                    <div class="dl-title">NFT Royalty & Metaverse Vision</div>
+                    <div class="dl-format fmt-ppt">Format: Powerpoint (15 MB)</div>
+                    <button class="dl-btn" onclick="fakeDownload('SUC_NFT_Metaverse.pptx')">⬇ Download PPT</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let isHindi = false;
+
+        function toggleLanguage() {
+            isHindi = !isHindi;
+            let btn = document.getElementById('lang-toggle-btn');
+            
+            let enElements = document.querySelectorAll('.lang-en');
+            let hiElements = document.querySelectorAll('.lang-hi');
+
+            if (isHindi) {
+                enElements.forEach(el => el.style.display = 'none');
+                hiElements.forEach(el => el.style.display = 'block');
+                btn.innerHTML = "🌐 Switch to English";
+            } else {
+                hiElements.forEach(el => el.style.display = 'none');
+                enElements.forEach(el => el.style.display = 'block');
+                btn.innerHTML = "🌐 Switch to Hindi";
+            }
+        }
+
+        function fakeDownload(fileName) {
+            // Ye alert sirf abhi ke liye hai. Live karne ke baad aap yahan asli file ka link dalenge.
+            alert(`📥 Downloading File: ${fileName}\n\n(Note for Admin: Upload your actual PDF/PPT files to the server and link them here before launch!)`);
+        }
+    </script>
+</body>
+</html>

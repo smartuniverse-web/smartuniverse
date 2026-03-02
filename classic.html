@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Matrix - Smart Universe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; margin: 0; padding-bottom: 50px; }
+        
+        /* Slot Grid Design */
+        .slot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        .slot-card { background-color: #151a25; border: 2px solid #2a2f3a; padding: 20px; border-radius: 12px; text-align: center; transition: all 0.3s ease; position: relative; }
+        .slot-card.unlocked { border-color: #00ff88; background: rgba(0, 255, 136, 0.05); }
+        .slot-card.locked { border-color: #2a2f3a; opacity: 0.7; }
+        .slot-price { font-size: 28px; font-weight: bold; color: #f3ba2f; margin: 10px 0; }
+        .slot-status { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+        .matrix-type { font-size: 12px; color: #00ff88; margin-bottom: 10px; font-weight: bold; }
+        .bonus-text { font-size: 11px; color: #151a25; font-weight: bold; background: #00ff88; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 15px; }
+        .unlocked .slot-status { color: #00ff88; }
+        .locked .slot-status { color: #a0a5b1; }
+        
+        /* Auto-Upgrade Toggle Design */
+        .auto-upgrade-bar {
+            background: #0b0e14; border: 1px solid #2a2f3a; max-width: 500px; margin: 0 auto 30px auto; 
+            padding: 15px 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ff4d4d; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #00ff88; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* Hold Wallet */
+        .hold-wallet { background: rgba(243, 186, 47, 0.1); border: 1px dashed #f3ba2f; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 12px; }
+        .hold-wallet strong { color: #f3ba2f; font-size: 16px; display: block; margin-top: 5px; }
+
+        /* Modal Design */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .matrix-modal { background: #151a25; width: 90%; max-width: 550px; padding: 30px; border-radius: 15px; border: 1px solid #f3ba2f; text-align: center; box-shadow: 0 10px 30px rgba(243, 186, 47, 0.2); max-height: 90vh; overflow-y: auto; }
+        .close-btn { float: right; color: #ff4d4d; font-size: 24px; cursor: pointer; font-weight: bold; margin-top: -15px; }
+        
+        /* Tree Render */
+        .tree-container { margin: 20px 0; display: flex; flex-direction: column; align-items: center; }
+        .node { width: 50px; height: 50px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-weight: bold; color: #000; font-size: 14px; z-index: 2; position: relative; }
+        .node-you { background: #f3ba2f; border: 3px solid #fff; box-shadow: 0 0 15px #f3ba2f; width: 60px; height: 60px; }
+        .node-downline { background: #0b0e14; color: #00ff88; border: 2px dashed #00ff88; }
+        .node-recycle { background: #ff4d4d; color: #fff; border: 2px solid #fff; box-shadow: 0 0 10px #ff4d4d; }
+        .line-vertical { width: 2px; height: 25px; background: #2a2f3a; margin: 0 auto; }
+        .dist-box { background: #0b0e14; border: 1px solid #2a2f3a; padding: 15px; border-radius: 8px; text-align: left; margin-top: 15px; }
+        .dist-box p { font-size: 14px; margin-bottom: 8px; color: #a0a5b1; }
+        .dist-box strong { color: #00ff88; }
+        
+        /* Header Buttons */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+        .submit-btn { border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s;}
+
+        /* Web3 Loader */
+        .loader { border: 4px solid #2a2f3a; border-top: 4px solid #f3ba2f; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo" style="display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px;">
+            <img src="logo.png" style="height: 35px; margin-right: 10px;" alt="Logo">
+            SMART UNIVERSE <span style="font-size: 12px; color: #00ff88; font-weight: normal; margin-left: 8px;">(SUC)</span>
+        </div>
+        <div class="auth-buttons"><button class="login-btn" onclick="window.location.href='user-dashboard.html'">Back</button></div>
+    </header>
+
+    <section class="auth-section" style="display: block; padding-top: 40px; padding-bottom: 50px;">
+        <h2 style="color: #f3ba2f; text-align: center; font-size: 32px; margin-bottom: 10px;">Classic Matrix</h2>
+        <p style="text-align: center; color: #a0a5b1; margin-bottom: 30px;">100% Decentralized Web3 Activation.</p>
+        
+        <div id="target-banner" style="background: linear-gradient(90deg, #151a25, #1a1608); border: 1px dashed #f3ba2f; padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; max-width: 500px; margin: 0 auto 20px auto;">
+            <div class="presale-text">
+                <h3 id="target-title" style="color: #f3ba2f; margin-bottom: 5px; font-size: 16px;">🚀 Target: Unlock Presale</h3>
+                <p id="target-desc" style="color: #a0a5b1; font-size: 13px;">Activate 3 Slots to unlock SUC Presale!</p>
+            </div>
+            <div id="prog-circle" style="width: 50px; height: 50px; border-radius: 50%; background: conic-gradient(#00ff88 0%, #2a2f3a 0); display: flex; justify-content: center; align-items: center; font-weight: bold; color: white;">
+                <div id="prog-text" style="width: 40px; height: 40px; background: #151a25; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px;">0/3</div>
+            </div>
+        </div>
+
+        <div class="auto-upgrade-bar">
+            <div>
+                <h4 style="color: #fff; margin-bottom: 3px;">Auto-Upgrade Next Slot</h4>
+                <p style="color: #a0a5b1; font-size: 12px;" id="upgrade-status-text">Fund will be held to auto-activate the next slot.</p>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="auto-upgrade-toggle" onchange="toggleAutoUpgrade()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="slot-grid" id="slots-container"></div>
+    </section>
+
+    <div class="modal-overlay" id="matrix-modal">
+        <div class="matrix-modal">
+            <span class="close-btn" onclick="closeMatrix()">×</span>
+            <h2 id="modal-title" style="color: #f3ba2f; margin-bottom: 5px;">Slot Matrix</h2>
+            <p id="modal-price" style="color: #a0a5b1; font-size: 18px; margin-bottom: 5px;">Value: $0</p>
+            <p id="modal-desc" style="color: #00ff88; font-size: 14px; margin-bottom: 20px; font-weight: bold;"></p>
+            <div class="tree-container" id="tree-render"></div>
+            <div class="dist-box" id="dist-render"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="web3-modal" style="z-index: 2000;">
+        <div class="matrix-modal" style="max-width: 400px;">
+            <div class="loader"></div>
+            <h3 style="color: #f3ba2f; margin-bottom: 10px;">Smart Contract Call</h3>
+            <p style="color: #a0a5b1; font-size: 14px;">Please approve the transaction of <strong id="web3-price" style="color:#fff;">0</strong> USDT in your connected Web3 Wallet...</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="receipt-modal" style="z-index: 2500;">
+        <div class="matrix-modal" style="max-width: 450px;">
+            <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
+            <h2 style="color: #00ff88; margin-bottom: 10px;">Transaction Successful!</h2>
+            <p style="color: #a0a5b1; font-size: 13px; margin-bottom: 20px;">Slot activated successfully via Smart Contract.</p>
+            
+            <div style="background: #0b0e14; border: 1px solid #2a2f3a; padding: 15px; border-radius: 8px; text-align: left; margin-bottom: 20px;">
+                <p style="color: #f3ba2f; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; font-weight: bold;">Smart Contract Distribution Log:</p>
+                <div id="receipt-details" style="font-size: 14px; color: #a0a5b1;"></div>
+            </div>
+            
+            <button class="submit-btn" style="background: #f3ba2f; color: #000; padding: 12px; font-size: 16px;" onclick="closeReceipt()">Awesome!</button>
+        </div>
+    </div>
+
+    <script>
+        const prices = [10, 20, 40, 80, 160, 320, 640, 1280, 2560, 5120, 10240, 20480];
+
+        function loadSlots() {
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            let unlockedSlots = savedUser.unlockedSlots || []; 
+            let autoUpgrade = savedUser.autoUpgrade !== undefined ? savedUser.autoUpgrade : true;
+            let upgradeFund = savedUser.upgradeFund || 0;
+
+            let slotsDone = unlockedSlots.length;
+            if(slotsDone >= 3) {
+                document.getElementById('prog-text').innerText = '3/3';
+                document.getElementById('prog-circle').style.background = 'conic-gradient(#00ff88 100%, #2a2f3a 0)';
+                document.getElementById('target-title').innerText = "🎉 Presale Unlocked!";
+                document.getElementById('target-title').style.color = "#00ff88";
+                document.getElementById('target-desc').innerText = "You can now buy SUC Tokens from Dashboard.";
+                document.getElementById('target-banner').style.borderColor = "#00ff88";
+            } else {
+                let percentage = (slotsDone / 3) * 100;
+                document.getElementById('prog-text').innerText = `${slotsDone}/3`;
+                document.getElementById('prog-circle').style.background = `conic-gradient(#00ff88 ${percentage}%, #2a2f3a 0)`;
+            }
+
+            document.getElementById('auto-upgrade-toggle').checked = autoUpgrade;
+            document.getElementById('upgrade-status-text').innerText = autoUpgrade ? 
+                "ON: Income held for next slot upgrade." : "OFF: All income goes to Main Wallet.";
+
+            let container = document.getElementById('slots-container');
+            container.innerHTML = "";
+            let maxUnlocked = unlockedSlots.length > 0 ? Math.max(...unlockedSlots) : 0;
+
+            for(let i = 0; i < 12; i++) {
+                let slotNum = i + 1;
+                let price = prices[i];
+                let isUnlocked = unlockedSlots.includes(slotNum);
+                let canActivate = (slotNum === 1) || unlockedSlots.includes(slotNum - 1);
+                let isS3 = (slotNum % 3 === 0);
+                let matrixTypeName = isS3 ? "S3 (3 Spots)" : "S6 (6 Spots)";
+
+                let cardClass = isUnlocked ? "unlocked" : "locked";
+                let statusText = isUnlocked ? "✅ UNLOCKED" : (canActivate ? "Ready to Activate" : "🔒 LOCKED");
+                
+                let btnText = "Locked"; let btnColor = "#2a2f3a"; let textColor = "#a0a5b1"; let onclickAction = "";
+
+                if(isUnlocked) {
+                    btnText = "View Matrix"; btnColor = "#0b0e14"; textColor = "#fff";
+                    onclickAction = `openMatrix(${slotNum}, ${price}, ${isS3})`;
+                } else if(canActivate) {
+                    btnText = `Activate for $${price}`; btnColor = "#f3ba2f"; textColor = "#000";
+                    onclickAction = `handleActivate(${slotNum}, ${price})`;
+                } else {
+                    btnText = `Requires Slot ${slotNum - 1}`;
+                }
+
+                let bonusBadge = "";
+                if(slotNum === 3) bonusBadge = `<div class="bonus-text">🔓 Unlocks Starter Plan</div>`;
+                else if(slotNum === 6) bonusBadge = `<div class="bonus-text">🔓 Unlocks Basic Plan</div>`;
+                else if(slotNum === 9) bonusBadge = `<div class="bonus-text">🔓 Unlocks Premium Plan</div>`;
+                else if(slotNum === 12) bonusBadge = `<div class="bonus-text">🔓 Unlocks VIP Plan</div>`;
+                else bonusBadge = `<div style="font-size: 11px; color: #a0a5b1; margin-bottom: 15px;">Deducts from Web3 Wallet</div>`;
+
+                let holdWalletUI = "";
+                if(isUnlocked && slotNum === maxUnlocked && slotNum < 12) {
+                    let nextPrice = prices[slotNum];
+                    if(autoUpgrade) {
+                        holdWalletUI = `<div class="hold-wallet">Next Slot Fund: <strong>$${upgradeFund} / $${nextPrice}</strong></div>
+                                        <button style="background: #00ff88; color: #000; border: none; padding: 5px; font-size: 10px; cursor: pointer; margin-bottom: 10px; border-radius: 3px; font-weight: bold;" onclick="simulateEarning(${price})">Simulate Matrix Earning</button>`;
+                    } else {
+                        holdWalletUI = `<div class="hold-wallet" style="border-color: #ff4d4d; background: rgba(255, 77, 77, 0.1);">Auto-Upgrade OFF<br><span style="color:#a0a5b1;">Income going to Main Wallet</span></div>`;
+                    }
+                } else if (isUnlocked && slotNum < maxUnlocked) {
+                    holdWalletUI = `<div style="font-size: 11px; color: #00ff88; margin-bottom: 15px;">Income -> Web3 Wallet directly</div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="slot-card ${cardClass}">
+                        <h3 style="color: #fff;">Slot ${slotNum}</h3>
+                        <div class="slot-price">$${price}</div>
+                        <div class="matrix-type">${matrixTypeName}</div>
+                        <div class="slot-status">${statusText}</div>
+                        ${bonusBadge}
+                        ${holdWalletUI}
+                        <button class="submit-btn" style="background-color: ${btnColor}; color: ${textColor}; padding: 10px;" ${onclickAction ? `onclick="${onclickAction}"` : 'disabled'}>${btnText}</button>
+                    </div>`;
+            }
+        }
+
+        function toggleAutoUpgrade() {
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            let isChecked = document.getElementById('auto-upgrade-toggle').checked;
+            savedUser.autoUpgrade = isChecked;
+            if(!isChecked && savedUser.upgradeFund > 0) {
+                savedUser.stsTokens = (savedUser.stsTokens || 0) + savedUser.upgradeFund;
+                alert(`Auto-Upgrade Turned OFF!\n\nYour held fund of $${savedUser.upgradeFund} has been moved to your Main Wallet as SUC Tokens.`);
+                savedUser.upgradeFund = 0;
+            }
+            localStorage.setItem('stsUser', JSON.stringify(savedUser));
+            loadSlots();
+        }
+
+        function handleActivate(slotNum, price) {
+            document.getElementById('web3-price').innerText = price;
+            document.getElementById('web3-modal').style.display = 'flex';
+
+            setTimeout(() => {
+                document.getElementById('web3-modal').style.display = 'none';
+                unlockSlotInDB(slotNum, price, false);
+            }, 2500);
+        }
+
+        function unlockSlotInDB(slotNum, price, isAuto) {
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            savedUser.stsTokens = (savedUser.stsTokens || 0) + price;
+            let unlockedSlots = savedUser.unlockedSlots || [];
+            unlockedSlots.push(slotNum);
+            savedUser.unlockedSlots = unlockedSlots;
+            localStorage.setItem('stsUser', JSON.stringify(savedUser));
+            
+            let isS3 = (slotNum % 3 === 0);
+            let fakeSponsor = "0x" + Math.random().toString(16).slice(2, 8).toUpperCase() + "...";
+            let fakePlacement = "0x" + Math.random().toString(16).slice(2, 8).toUpperCase() + "...";
+            let distMessage = "";
+
+            if(isS3) {
+                distMessage = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>From:</span> <strong style="color:#fff;">Your Web3 Wallet</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Amount Deducted:</span> <strong style="color:#ff4d4d;">-${price} USDT</strong></div>
+                    <hr style="border: 0; border-top: 1px dashed #2a2f3a; margin: 10px 0;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>100% (${price} USDT) To:</span> <strong style="color:#00ff88;">Direct Sponsor / Upline</strong></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Wallet Addr:</span> <strong style="color:#00ff88;">${fakeSponsor}</strong></div>
+                `;
+            } else {
+                let splitPrice = price / 2;
+                distMessage = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>From:</span> <strong style="color:#fff;">Your Web3 Wallet</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Amount Deducted:</span> <strong style="color:#ff4d4d;">-${price} USDT</strong></div>
+                    <hr style="border: 0; border-top: 1px dashed #2a2f3a; margin: 10px 0;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>50% (${splitPrice} USDT) To:</span> <strong style="color:#00ff88;">Direct Sponsor</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>Wallet Addr:</span> <strong style="color:#00ff88;">${fakeSponsor}</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>50% (${splitPrice} USDT) To:</span> <strong style="color:#00ff88;">Placement Upline</strong></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Wallet Addr:</span> <strong style="color:#00ff88;">${fakePlacement}</strong></div>
+                `;
+            }
+
+            document.getElementById('receipt-details').innerHTML = distMessage;
+            document.getElementById('receipt-modal').style.display = 'flex';
+            
+            loadSlots(); 
+        }
+
+        function closeReceipt() {
+            document.getElementById('receipt-modal').style.display = 'none';
+        }
+
+        function simulateEarning(currentSlotPrice) {
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            let upgradeFund = savedUser.upgradeFund || 0;
+            let unlockedSlots = savedUser.unlockedSlots || [];
+            let maxUnlocked = Math.max(...unlockedSlots);
+            let nextSlotPrice = prices[maxUnlocked]; 
+            
+            upgradeFund += currentSlotPrice;
+
+            if(upgradeFund >= nextSlotPrice) {
+                savedUser.upgradeFund = upgradeFund - nextSlotPrice;
+                localStorage.setItem('stsUser', JSON.stringify(savedUser));
+                unlockSlotInDB(maxUnlocked + 1, nextSlotPrice, true);
+            } else {
+                savedUser.upgradeFund = upgradeFund;
+                localStorage.setItem('stsUser', JSON.stringify(savedUser));
+                loadSlots();
+            }
+        }
+
+        function openMatrix(slotNum, price, isS3) {
+            document.getElementById('matrix-modal').style.display = 'flex';
+            document.getElementById('modal-title').innerText = `Slot ${slotNum} Matrix`;
+            document.getElementById('modal-price').innerText = `Value: $${price}`;
+            
+            let treeHTML = ''; let distHTML = '';
+            if (isS3) {
+                document.getElementById('modal-desc').innerText = "S3 MATRIX: 3 Spots Logic";
+                treeHTML = `<div class="node node-you">YOU</div><div class="line-vertical"></div><div style="display: flex; gap: 40px; margin-top: -5px;"><div style="width: 2px; height: 20px; background: #2a2f3a; transform: rotate(45deg);"></div><div style="width: 2px; height: 20px; background: #2a2f3a;"></div><div style="width: 2px; height: 20px; background: #2a2f3a; transform: rotate(-45deg);"></div></div><div style="display: flex; gap: 20px; justify-content: center; margin-top: 10px;"><div class="node node-downline">1</div><div class="node node-downline">2</div><div class="node node-recycle" title="3rd Person Recycles">↺</div></div>`;
+                distHTML = `<h4 style="color: #fff; margin-bottom: 10px; border-bottom: 1px solid #2a2f3a; padding-bottom: 5px;">100% Decentralized Distribution</h4>
+                            <p>Spot 1 & 2: <strong style="color: #00ff88;">100% to Worker (You)</strong></p>
+                            <p>Recycle Spot (3rd): <strong style="color: #f3ba2f;">100% to Upline</strong></p>`;
+            } else {
+                document.getElementById('modal-desc').innerText = "S6 MATRIX: 6 Spots Cross-Spillover";
+                treeHTML = `<div class="node node-you">YOU</div><div class="line-vertical"></div><div style="display: flex; justify-content: space-between; width: 150px; border-top: 2px solid #2a2f3a; padding-top: 10px;"><div style="display: flex; flex-direction: column; align-items: center;"><div class="node node-downline">1</div><div class="line-vertical" style="height: 15px;"></div><div style="display: flex; justify-content: space-between; width: 80px; border-top: 2px solid #2a2f3a; padding-top: 10px;"><div class="node node-downline" style="width: 35px; height: 35px;">1</div><div class="node node-downline" style="width: 35px; height: 35px;">2</div></div></div><div style="display: flex; flex-direction: column; align-items: center;"><div class="node node-downline">2</div><div class="line-vertical" style="height: 15px;"></div><div style="display: flex; justify-content: space-between; width: 80px; border-top: 2px solid #2a2f3a; padding-top: 10px;"><div class="node node-downline" style="width: 35px; height: 35px;">3</div><div class="node node-recycle" style="width: 35px; height: 35px;" title="4th Person Recycles">↺</div></div></div></div>`;
+                
+                // 🔥 CHANGED COMPANY WALLET TO 50% RECYCLE 🔥
+                distHTML = `<h4 style="color: #fff; margin-bottom: 10px; border-bottom: 1px solid #2a2f3a; padding-bottom: 5px;">100% Decentralized Distribution</h4>
+                            <p>Standard Spots: <strong style="color: #00ff88;">50% Direct Sponsor / 50% Placement Upline</strong></p>
+                            <p>Recycle Spot (6th): <strong style="color: #f3ba2f;">50% Direct Sponsor / 50% Recycle</strong></p>`;
+            }
+            document.getElementById('tree-render').innerHTML = treeHTML;
+            document.getElementById('dist-render').innerHTML = distHTML;
+        }
+
+        function closeMatrix() { document.getElementById('matrix-modal').style.display = 'none'; }
+        window.onload = loadSlots;
+    </script>
+</body>
+</html>

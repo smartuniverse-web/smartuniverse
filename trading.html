@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Trading - Smart Universe</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; }
+
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .logo { display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px; }
+        .logo img { height: 35px; margin-right: 10px; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        /* ट्रेडिंग हेडर (बैलेंस और प्राइस) */
+        .trading-header { display: flex; justify-content: space-between; align-items: center; background: #151a25; padding: 15px 25px; border-radius: 12px; border: 1px solid #2a2f3a; margin-bottom: 20px; flex-wrap: wrap; gap: 20px;}
+        .pair-info select { background: #0b0e14; color: #f3ba2f; border: 1px solid #f3ba2f; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 18px; outline: none; cursor: pointer;}
+        
+        .price-info { text-align: right; }
+        .price-info p { color: #a0a5b1; font-size: 12px; margin-bottom: 5px;}
+        .price-info h2 { color: #00ff88; font-size: 28px; font-weight: bold; }
+
+        .user-balance-bar { display: flex; gap: 20px; background: rgba(0,255,136,0.05); padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(0,255,136,0.2); }
+        .bal-item { font-size: 13px; font-weight: bold; }
+        .bal-item span { color: #f3ba2f; margin-left: 5px;}
+
+        /* चार्ट एरिया */
+        .chart-container { height: 500px; background: #0b0e14; border: 1px solid #2a2f3a; border-radius: 12px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
+
+        /* ट्रेड पैनल */
+        .trade-panel { display: flex; gap: 20px; flex-wrap: wrap; }
+        .trade-box { flex: 1; min-width: 300px; background: #151a25; border: 1px solid #2a2f3a; border-radius: 12px; padding: 25px; position: relative; overflow: hidden;}
+        .trade-box h3 { margin-bottom: 20px; font-size: 20px; display: flex; justify-content: space-between;}
+        
+        .buy-box { border-top: 4px solid #00ff88; }
+        .sell-box { border-top: 4px solid #ff4d4d; }
+
+        .input-group { margin-bottom: 15px; text-align: left;}
+        .input-group label { display: block; color: #a0a5b1; font-size: 12px; margin-bottom: 8px;}
+        .input-group input { width: 100%; background: #0b0e14; border: 1px solid #2a2f3a; color: #fff; padding: 12px; border-radius: 8px; outline: none; font-weight: bold;}
+        .input-group input:focus { border-color: #f3ba2f; }
+
+        .submit-btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; text-transform: uppercase;}
+        .btn-buy { background: #00ff88; color: #000; }
+        .btn-buy:hover { background: #00cc6a; transform: translateY(-2px); }
+        .btn-sell { background: #ff4d4d; color: #fff; }
+        .btn-sell:hover { background: #e60000; transform: translateY(-2px); }
+
+        @media(max-width: 768px) {
+            .chart-container { height: 350px; }
+            .trading-header { flex-direction: column; text-align: center; }
+            .price-info { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo"> 
+            SMART UNIVERSE <span style="font-size: 12px; color: #00ff88; margin-left: 8px;">(SUC)</span>
+        </div>
+        <div class="auth-buttons">
+            <button class="login-btn" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="trading-header">
+            <div class="pair-info">
+                <p style="color:#a0a5b1; font-size: 12px; margin-bottom: 5px;">Select Asset</p>
+                <select id="market-coin-select" onchange="changeCoinMarket()">
+                    <option value="BTC">BTC / USDT</option>
+                </select>
+            </div>
+
+            <div class="user-balance-bar">
+                <div class="bal-item">Available: <span id="user-usdt-bal">0.00 USDT</span></div>
+                <div class="bal-item">Native: <span id="user-suc-bal">0 SUC</span></div>
+            </div>
+
+            <div class="price-info">
+                <p>Real-time Market Price</p>
+                <h2 id="live-price">Loading...</h2>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div id="tv_chart_container" style="height: 100%; width: 100%;"></div>
+        </div>
+
+        <div class="trade-panel">
+            <div class="trade-box buy-box">
+                <h3 style="color: #00ff88;">BUY <span id="coin-label-1">BTC</span></h3>
+                <div class="input-group">
+                    <label>Order Price (USDT)</label>
+                    <input type="text" id="buy-price-input" readonly>
+                </div>
+                <div class="input-group">
+                    <label>Amount (<span id="coin-label-2">BTC</span>)</label>
+                    <input type="number" id="buy-amount" placeholder="0.00" oninput="calculateTotal('buy')">
+                </div>
+                <p style="font-size: 12px; color: #a0a5b1; margin-bottom: 15px;">Total: <span id="buy-total" style="color:#fff;">0.00</span> USDT</p>
+                <button class="submit-btn btn-buy" onclick="tradeAlert('Buy')">Buy Now</button>
+            </div>
+
+            <div class="trade-box sell-box">
+                <h3 style="color: #ff4d4d;">SELL <span id="coin-label-3">BTC</span></h3>
+                <div class="input-group">
+                    <label>Order Price (USDT)</label>
+                    <input type="text" id="sell-price-input" readonly>
+                </div>
+                <div class="input-group">
+                    <label>Amount (<span id="coin-label-4">BTC</span>)</label>
+                    <input type="number" id="sell-amount" placeholder="0.00" oninput="calculateTotal('sell')">
+                </div>
+                <p style="font-size: 12px; color: #a0a5b1; margin-bottom: 15px;">You Get: <span id="sell-total" style="color:#fff;">0.00</span> USDT</p>
+                <button class="submit-btn btn-sell" onclick="tradeAlert('Sell')">Sell Now</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSymbol = "BTC";
+        let currentPrice = 0;
+        let priceInterval;
+
+        window.onload = async function() {
+            // लोड यूज़र बैलेंस
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            document.getElementById('user-usdt-bal').innerText = (savedUser.usdtBalance || 1250.00).toFixed(2) + " USDT";
+            document.getElementById('user-suc-bal').innerText = (savedUser.stsTokens || 0) + " SUC";
+
+            await loadMarketCoins();
+            renderChart(currentSymbol);
+            updatePrice();
+            priceInterval = setInterval(updatePrice, 3000);
+        };
+
+        async function loadMarketCoins() {
+            try {
+                let res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false');
+                let coins = await res.json();
+                let select = document.getElementById('market-coin-select');
+                let html = '<option value="SUC">SUC / USDT (Native)</option>';
+                
+                coins.forEach(coin => {
+                    if(coin.symbol.toUpperCase() !== 'USDT') {
+                        html += `<option value="${coin.symbol.toUpperCase()}">${coin.symbol.toUpperCase()} / USDT</option>`;
+                    }
+                });
+                select.innerHTML = html;
+                select.value = "BTC";
+            } catch (e) { console.log("Coin list error"); }
+        }
+
+        function renderChart(symbol) {
+            // अगर SUC है तो BTC का चार्ट दिखाएँ (क्युकी SUC TradingView पर नहीं है)
+            let chartSymbol = (symbol === "SUC") ? "BTC" : symbol;
+            
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": "BINANCE:" + chartSymbol + "USDT",
+                "interval": "15",
+                "timezone": "Asia/Kolkata",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "container_id": "tv_chart_container"
+            });
+        }
+
+        async function updatePrice() {
+            try {
+                if(currentSymbol === "SUC") {
+                    currentPrice = 0.10; // SUC Native Price
+                } else {
+                    let res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${currentSymbol}USDT`);
+                    let data = await res.json();
+                    currentPrice = parseFloat(data.price);
+                }
+
+                let formatted = currentPrice < 1 ? currentPrice.toFixed(4) : currentPrice.toLocaleString();
+                document.getElementById('live-price').innerText = "$" + formatted;
+                document.getElementById('buy-price-input').value = currentPrice.toFixed(4);
+                document.getElementById('sell-price-input').value = currentPrice.toFixed(4);
+                
+                calculateTotal('buy');
+                calculateTotal('sell');
+            } catch (e) { }
+        }
+
+        function changeCoinMarket() {
+            currentSymbol = document.getElementById('market-coin-select').value;
+            
+            // अपडेट लेबल्स
+            document.getElementById('coin-label-1').innerText = currentSymbol;
+            document.getElementById('coin-label-2').innerText = currentSymbol;
+            document.getElementById('coin-label-3').innerText = currentSymbol;
+            document.getElementById('coin-label-4').innerText = currentSymbol;
+
+            renderChart(currentSymbol);
+            updatePrice();
+        }
+
+        function calculateTotal(type) {
+            let amt = document.getElementById(type + '-amount').value;
+            let total = amt * currentPrice;
+            document.getElementById(type + '-total').innerText = total.toFixed(2);
+        }
+
+        function tradeAlert(type) {
+            alert(`⚠️ MARKET EXECUTION PAUSED\n\nLive ${type} orders are temporarily suspended for system maintenance.\n\nTip: Use 'Stake & ROI Earn' for 100% guaranteed daily profits!`);
+        }
+    </script>
+</body>
+</html>

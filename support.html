@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support - Smart Universe</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; }
+
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .logo { display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px; }
+        .logo img { height: 35px; margin-right: 10px; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+
+        .support-box { background: #151a25; border: 1px solid #2a2f3a; padding: 35px; border-radius: 12px; max-width: 600px; margin: 40px auto; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .contact-btn { background: #0b0e14; color: #fff; border: 1px solid #00ff88; padding: 12px 25px; border-radius: 8px; text-decoration: none; display: inline-block; margin: 10px; font-weight: bold; transition: 0.3s; font-size: 14px;}
+        .contact-btn:hover { background: #00ff88; color: #000; transform: translateY(-2px); }
+        
+        .tg-btn { border-color: #00d2ff; color: #00d2ff; }
+        .tg-btn:hover { background: #00d2ff; color: #fff; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); }
+
+        .ticket-form { text-align: left; margin-top: 30px; padding-top: 25px; border-top: 1px dashed #2a2f3a; }
+        .ticket-form h3 { color: #f3ba2f; margin-bottom: 20px; font-size: 18px; text-align: center; }
+        
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; color: #a0a5b1; font-size: 12px; margin-bottom: 8px; font-weight: bold;}
+        
+        .ticket-form input, .ticket-form textarea { 
+            width: 100%; background: #0b0e14; border: 1px solid #2a2f3a; color: #fff; padding: 14px; border-radius: 8px; outline: none; transition: 0.3s; font-size: 14px;
+        }
+        .ticket-form input:focus, .ticket-form textarea:focus { border-color: #f3ba2f; box-shadow: 0 0 10px rgba(243,186,47,0.2); }
+
+        .submit-btn { width: 100%; background: #f3ba2f; color: #000; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; text-transform: uppercase;}
+        .submit-btn:hover { background: #e5a920; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(243,186,47,0.4);}
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo"> 
+            SMART UNIVERSE <span style="font-size: 12px; color: #00ff88; margin-left: 8px;">(SUC)</span>
+        </div>
+        <div class="auth-buttons">
+            <button class="login-btn" onclick="window.location.href='dashboard.html'">Back</button>
+        </div>
+    </header>
+
+    <section class="auth-section">
+        <h2 style="color: #00ff88; text-align: center; font-size: 32px; margin-top: 40px; margin-bottom: 10px;">🎧 Help & Support</h2>
+        <p style="text-align: center; color: #a0a5b1; margin-bottom: 10px;">We are here to help you 24/7.</p>
+        
+        <div class="support-box">
+            <h3 style="color: #fff; margin-bottom: 20px; font-size: 20px;">Direct Contact</h3>
+            <p style="color: #a0a5b1; font-size: 14px; margin-bottom: 25px; line-height: 1.6;">Connect with our official support team for instant resolution regarding deposits, slots, or ROI issues.</p>
+            
+            <a href="#" class="contact-btn tg-btn" onclick="alert('Redirecting to Official Telegram Support: @SmartUniverse_Support')">✈️ Telegram Support</a>
+            <a href="mailto:support@smartuniverse.live" class="contact-btn">📧 Email Support</a>
+
+            <div class="ticket-form">
+                <h3>Or Submit a Ticket</h3>
+                <div class="input-group">
+                    <label>Your SUC-ID</label>
+                    <input type="text" placeholder="e.g. SUC-123456" id="sup-id">
+                </div>
+                <div class="input-group">
+                    <label>Issue Subject</label>
+                    <input type="text" placeholder="e.g. Deposit not showing" id="sup-sub">
+                </div>
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea rows="4" placeholder="Explain your problem in detail..." id="sup-msg"></textarea>
+                </div>
+                <button class="submit-btn" onclick="submitTicket()">Send Ticket</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        window.onload = function() {
+            // ऑटो-फिल यूजर ID
+            let savedUser = JSON.parse(localStorage.getItem('stsUser'));
+            if(savedUser) {
+                // पुरानी ID 'STS' से शुरू हो सकती है, उसे 'SUC-' में बदलकर दिखाएंगे
+                let displayId = savedUser.stsId ? savedUser.stsId.replace("STS", "SUC-") : "";
+                document.getElementById('sup-id').value = displayId;
+            }
+        };
+
+        function submitTicket() {
+            let id = document.getElementById('sup-id').value;
+            let sub = document.getElementById('sup-sub').value;
+            let msg = document.getElementById('sup-msg').value;
+
+            if(id === "" || sub === "" || msg === "") { 
+                alert("❌ Please fill all the fields before submitting."); 
+                return; 
+            }
+
+            // एनीमेशन इफ़ेक्ट के लिए
+            let btn = event.currentTarget;
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert(`✅ Support Ticket Submitted!\n\nTicket ID: #SUC${Math.floor(1000 + Math.random() * 9000)}\n\nOur team will review your message and respond to your registered email within 24 hours.`);
+                document.getElementById('sup-sub').value = "";
+                document.getElementById('sup-msg').value = "";
+                btn.innerText = "Send Ticket";
+                btn.disabled = false;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

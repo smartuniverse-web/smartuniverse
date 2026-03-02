@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Prediction Gaming - Smart Universe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; }
+
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .logo { display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px; }
+        .logo img { height: 35px; margin-right: 10px; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+
+        .container { max-width: 900px; margin: 30px auto; padding: 0 15px; }
+
+        /* डुअल वॉलेट सिस्टम (Main vs Gaming) */
+        .wallets-container { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        .wallet-box { flex: 1; background: #151a25; border: 1px solid #2a2f3a; border-radius: 12px; padding: 20px; min-width: 300px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .wallet-box.gaming { border-color: #f3ba2f; background: linear-gradient(135deg, #151a25, #1a1608); }
+        .wallet-title { color: #a0a5b1; font-size: 14px; margin-bottom: 15px; border-bottom: 1px dashed #2a2f3a; padding-bottom: 8px; display: flex; justify-content: space-between;}
+        .wallet-title.gold { color: #f3ba2f; border-color: #f3ba2f;}
+        
+        .bal-row { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;}
+        .bal-label { color: #e2e8f0; font-size: 14px; font-weight: bold;}
+        .bal-amt { color: #00ff88; font-size: 18px; font-weight: bold;}
+        .bal-amt span { font-size: 12px; color: #a0a5b1;}
+
+        /* ट्रान्सफर एरिया */
+        .transfer-area { background: #0b0e14; border: 1px solid #2a2f3a; border-radius: 8px; padding: 15px; margin-bottom: 25px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
+        .transfer-area select, .transfer-area input { background: #151a25; border: 1px solid #2a2f3a; color: #fff; padding: 10px; border-radius: 5px; outline: none; flex: 1; min-width: 120px;}
+        .transfer-btn { background: #f3ba2f; color: #000; border: none; padding: 10px 20px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.3s; flex: 1; min-width: 150px;}
+        .transfer-btn:hover { background: #e5a920; }
+        
+        /* गेम टाइमर टैब्स */
+        .time-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;}
+        .tab-btn { background: #151a25; border: 1px solid #2a2f3a; color: #a0a5b1; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; flex: 1; min-width: 120px; position: relative;}
+        .tab-btn.active { background: #2a2f3a; color: #f3ba2f; border-color: #f3ba2f; }
+        .global-timer-badge { position: absolute; top: -10px; right: -10px; background: #ff4d4d; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 10px; font-weight: bold; box-shadow: 0 0 10px rgba(255,77,77,0.5);}
+
+        /* लाइव प्राइस एरिया */
+        .chart-area { background: #151a25; border: 1px solid #2a2f3a; border-radius: 12px; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+        .asset-select-box { position: absolute; top: 15px; left: 20px; }
+        .asset-select-box select { background: #0b0e14; color: #f3ba2f; border: 1px solid #f3ba2f; padding: 8px 15px; border-radius: 5px; font-weight: bold; outline: none; font-size: 16px; cursor: pointer;}
+        .live-price { font-size: 55px; color: #00ff88; font-weight: bold; text-shadow: 0 0 20px rgba(0,255,136,0.5); transition: color 0.3s; margin-top: 15px;}
+        .live-price.down { color: #ff4d4d; text-shadow: 0 0 20px rgba(255,77,77,0.5); }
+        .main-timer { position: absolute; top: 15px; right: 20px; font-size: 28px; color: #fff; font-weight: bold; background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 8px; border: 1px solid #2a2f3a;}
+        .main-timer.warning { color: #ff4d4d; border-color: #ff4d4d; animation: blink 1s infinite; }
+
+        /* बेटिंग कंट्रोल्स */
+        .bet-controls { background: #151a25; border: 1px solid #2a2f3a; border-radius: 12px; padding: 25px; margin-bottom: 30px; }
+        .input-row { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;}
+        .currency-toggle { display: flex; background: #0b0e14; border: 1px solid #2a2f3a; border-radius: 8px; overflow: hidden; flex: 1; min-width: 200px;}
+        .curr-btn { flex: 1; background: transparent; color: #a0a5b1; border: none; padding: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .curr-btn.active { background: #2a2f3a; color: #f3ba2f; border-bottom: 2px solid #f3ba2f;}
+        .amount-input { flex: 1; min-width: 200px; background: #0b0e14; border: 1px solid #2a2f3a; border-radius: 8px; padding: 12px 15px; color: #fff; font-size: 18px; font-weight: bold; outline: none; text-align: center;}
+        
+        /* बड़े UP/DOWN बटन्स */
+        .action-buttons { display: flex; gap: 20px; }
+        .action-btn { flex: 1; padding: 25px; border: none; border-radius: 12px; font-size: 26px; font-weight: bold; cursor: pointer; color: #fff; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; text-transform: uppercase;}
+        .btn-up { background: linear-gradient(180deg, #00e676, #00a152); box-shadow: 0 10px 0 #00733b, 0 15px 20px rgba(0,255,136,0.3); }
+        .btn-up:active { transform: translateY(10px); box-shadow: 0 0 0 #00733b, 0 5px 10px rgba(0,255,136,0.3); }
+        .btn-down { background: linear-gradient(180deg, #ff5252, #d50000); box-shadow: 0 10px 0 #9b0000, 0 15px 20px rgba(255,77,77,0.3); }
+        .btn-down:active { transform: translateY(10px); box-shadow: 0 0 0 #9b0000, 0 5px 10px rgba(255,77,77,0.3); }
+
+        /* अनलिमिटेड लाइव दांव लिस्ट */
+        .live-bets { background: #151a25; border: 1px solid #2a2f3a; border-radius: 12px; padding: 20px; overflow: hidden;}
+        .live-bets h3 { color: #f3ba2f; margin-bottom: 15px; font-size: 18px; border-bottom: 1px dashed #2a2f3a; padding-bottom: 10px; display: flex; justify-content: space-between;}
+        .live-bets-container { max-height: 400px; overflow-y: hidden; position: relative;}
+        .bet-row { display: flex; justify-content: space-between; padding: 12px 15px; margin-bottom: 8px; background: #0b0e14; border-radius: 8px; border-left: 3px solid #2a2f3a; font-size: 14px; animation: slideDown 0.3s ease-out; }
+        .bet-row.my-bet { background: rgba(243,186,47,0.15); border-left: 3px solid #f3ba2f; box-shadow: 0 0 10px rgba(243,186,47,0.2);}
+        .bet-user { color: #a0a5b1; font-weight: bold; width: 30%;}
+        .bet-amt { font-weight: bold; width: 40%; text-align: center; color: #fff;}
+        .bet-dir { font-weight: bold; width: 30%; text-align: right;}
+        .bet-dir.up { color: #00ff88; }
+        .bet-dir.down { color: #ff4d4d; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        @media(max-width: 768px) {
+            .action-btn { font-size: 20px; padding: 15px; }
+            .live-price { font-size: 40px; }
+            .time-tabs { flex-direction: column; }
+            .wallets-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo"> SMART UNIVERSE <span style="font-size: 12px; color: #00ff88; margin-left: 8px;">(SUC)</span>
+        </div>
+        <button class="login-btn" onclick="window.location.href='dashboard.html'">Back</button>
+    </header>
+
+    <div class="container">
+        
+        <div class="wallets-container">
+            <div class="wallet-box">
+                <div class="wallet-title">🏛️ Main Wallet (Safe) <span>Not for Betting</span></div>
+                <div class="bal-row"><span class="bal-label">USDT:</span><div class="bal-amt" id="main-usdt">0.00 <span>USDT</span></div></div>
+                <div class="bal-row"><span class="bal-label" style="color:#f3ba2f;">SUC Token:</span><div class="bal-amt" style="color:#f3ba2f;" id="main-suc">0 <span>SUC</span></div></div>
+            </div>
+            
+            <div class="wallet-box gaming">
+                <div class="wallet-title gold">🎮 Gaming Wallet (Active) <span>Use for Betting</span></div>
+                <div class="bal-row"><span class="bal-label">USDT:</span><div class="bal-amt" id="game-usdt">0.00 <span>USDT</span></div></div>
+                <div class="bal-row"><span class="bal-label" style="color:#f3ba2f;">SUC Token:</span><div class="bal-amt" style="color:#f3ba2f;" id="game-suc">0 <span>SUC</span></div></div>
+            </div>
+        </div>
+
+        <div class="transfer-area">
+            <select id="trans-dir">
+                <option value="in">⬇️ Deposit to Gaming</option>
+                <option value="out">⬆️ Withdraw to Main</option>
+            </select>
+            <select id="trans-coin">
+                <option value="USDT">USDT</option>
+                <option value="SUC">SUC Token</option>
+            </select>
+            <input type="number" id="trans-amt" placeholder="Amount" min="1">
+            <button class="transfer-btn" onclick="transferFunds()">Transfer Now</button>
+        </div>
+
+        <div class="time-tabs">
+            <button class="tab-btn" id="tab-15" onclick="selectTab(15)">15s Blitz <span class="global-timer-badge" id="badge-15">15s</span></button>
+            <button class="tab-btn active" id="tab-30" onclick="selectTab(30)">30s Rapid <span class="global-timer-badge" id="badge-30">30s</span></button>
+            <button class="tab-btn" id="tab-60" onclick="selectTab(60)">60s Classic <span class="global-timer-badge" id="badge-60">60s</span></button>
+        </div>
+
+        <div class="chart-area">
+            <div class="asset-select-box">
+                <select id="asset-select" onchange="changeCrypto()">
+                    <option value="64230">BTC / USDT</option>
+                    <option value="3450">ETH / USDT</option>
+                    <option value="590">BNB / USDT</option>
+                    <option value="145">SOL / USDT</option>
+                    <option value="0.55">XRP / USDT</option>
+                    <option value="0.15">DOGE / USDT</option>
+                    <option value="34.50">AVAX / USDT</option>
+                    <option value="0.80">MATIC / USDT</option>
+                    <option value="16.20">LINK / USDT</option>
+                    <option value="0.10">SUC / USDT (Native)</option>
+                </select>
+            </div>
+            <div class="main-timer" id="main-display-timer">00:30</div>
+            <div class="live-price" id="price-ticker">64,230.50</div>
+        </div>
+
+        <div class="bet-controls">
+            <div class="input-row">
+                <div class="currency-toggle">
+                    <button class="curr-btn active" id="curr-usdt" onclick="setCurrency('USDT')">Play USDT</button>
+                    <button class="curr-btn" id="curr-suc" onclick="setCurrency('SUC')">Play SUC</button>
+                </div>
+                <input type="number" id="bet-amount" class="amount-input" placeholder="Min: 1" value="10" min="1">
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn btn-up" onclick="placeBet('UP')">📈 UP</button>
+                <button class="action-btn btn-down" onclick="placeBet('DOWN')">📉 DOWN</button>
+            </div>
+        </div>
+
+        <div class="live-bets">
+            <h3>🔴 Global Live Bets <span style="font-size: 12px; color: #00ff88; animation: blink 1s infinite;">● LIVE</span></h3>
+            <div class="live-bets-container" id="bets-list"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Wallets
+        let mainSUC = 0; let mainUSDT = 1250; 
+        let gameSUC = 0; let gameUSDT = 0;
+        
+        let selectedTab = 30; 
+        let selectedCurrency = "USDT";
+        let basePrice = 64230.50;
+        
+        // Global Timers & User Bets
+        let globalTimers = { 15: 15, 30: 30, 60: 60 };
+        let activeUserBets = { 15: null, 30: null, 60: null }; 
+
+        window.onload = function() {
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            
+            // Main Wallet
+            mainSUC = savedUser.stsTokens || 0; 
+            mainUSDT = savedUser.usdtBalance !== undefined ? savedUser.usdtBalance : 1250.00; 
+            
+            // Gaming Wallet
+            gameSUC = savedUser.gameSUC || 0;
+            gameUSDT = savedUser.gameUSDT || 0;
+
+            updateBalanceUI();
+            startGlobalTimers();
+            startFakeBots();
+        };
+
+        function updateBalanceUI() {
+            document.getElementById('main-suc').innerHTML = `${mainSUC.toFixed(2)} <span>SUC</span>`;
+            document.getElementById('main-usdt').innerHTML = `${mainUSDT.toFixed(2)} <span>USDT</span>`;
+            document.getElementById('game-suc').innerHTML = `${gameSUC.toFixed(2)} <span>SUC</span>`;
+            document.getElementById('game-usdt').innerHTML = `${gameUSDT.toFixed(2)} <span>USDT</span>`;
+        }
+
+        // --- TRANSFER FUNDS LOGIC ---
+        function transferFunds() {
+            let dir = document.getElementById('trans-dir').value;
+            let coin = document.getElementById('trans-coin').value;
+            let amt = parseFloat(document.getElementById('trans-amt').value);
+
+            if(isNaN(amt) || amt <= 0) return alert("Enter a valid amount!");
+
+            if(dir === 'in') { // Main to Game
+                if(coin === 'USDT' && amt <= mainUSDT) { mainUSDT -= amt; gameUSDT += amt; }
+                else if(coin === 'SUC' && amt <= mainSUC) { mainSUC -= amt; gameSUC += amt; }
+                else { return alert("Insufficient balance in Main Wallet!"); }
+            } else { // Game to Main
+                if(coin === 'USDT' && amt <= gameUSDT) { gameUSDT -= amt; mainUSDT += amt; }
+                else if(coin === 'SUC' && amt <= gameSUC) { gameSUC -= amt; mainSUC += amt; }
+                else { return alert("Insufficient balance in Gaming Wallet!"); }
+            }
+            
+            updateBalanceUI();
+            saveToDB();
+            alert(`✅ Transfer Successful!\n${amt} ${coin} moved ${dir === 'in' ? 'to Gaming Wallet' : 'to Main Wallet'}.`);
+            document.getElementById('trans-amt').value = '';
+        }
+
+        // --- LIVE PRICE SIMULATOR ---
+        function changeCrypto() {
+            basePrice = parseFloat(document.getElementById('asset-select').value);
+        }
+
+        setInterval(() => {
+            let volatility = basePrice * 0.0002;
+            let change = (Math.random() * volatility * 2) - volatility; 
+            basePrice += change;
+            
+            let priceEl = document.getElementById('price-ticker');
+            let decimals = basePrice < 10 ? 4 : 2;
+            priceEl.innerText = basePrice.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
+            
+            if(change < 0) priceEl.classList.add('down'); else priceEl.classList.remove('down');
+        }, 700);
+
+        // --- GLOBAL PERMANENT TIMERS & 5 SEC LOCK ---
+        function startGlobalTimers() {
+            setInterval(() => {
+                [15, 30, 60].forEach(t => {
+                    globalTimers[t]--;
+                    let tVal = globalTimers[t];
+                    
+                    document.getElementById(`badge-${t}`).innerText = `00:${tVal < 10 ? '0'+tVal : tVal}`;
+                    
+                    if(selectedTab === t) {
+                        let mainTimerEl = document.getElementById('main-display-timer');
+                        mainTimerEl.innerText = `00:${tVal < 10 ? '0'+tVal : tVal}`;
+                        
+                        // 🔥 5 SECOND LOCK WARNING UI
+                        if(tVal <= 5) mainTimerEl.classList.add('warning');
+                        else mainTimerEl.classList.remove('warning');
+                    }
+
+                    if(tVal <= 0) {
+                        resolveRound(t);
+                        globalTimers[t] = t; 
+                    }
+                });
+            }, 1000);
+        }
+
+        function selectTab(seconds) {
+            selectedTab = seconds;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${seconds}`).classList.add('active');
+            document.getElementById('main-display-timer').innerText = `00:${globalTimers[seconds] < 10 ? '0'+globalTimers[seconds] : globalTimers[seconds]}`;
+        }
+
+        function setCurrency(curr) {
+            selectedCurrency = curr;
+            document.querySelectorAll('.curr-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`curr-${curr.toLowerCase()}`).classList.add('active');
+        }
+
+        // --- PLACE BET LOGIC ---
+        function placeBet(direction) {
+            // 🔥 THE 5-SECOND LOCK RULE 🔥
+            if(globalTimers[selectedTab] <= 5) {
+                return alert(`⏳ BETTING CLOSED!\n\nYou cannot place a bet in the last 5 seconds of the round. Please wait for the new round to start.`);
+            }
+
+            let amt = parseFloat(document.getElementById('bet-amount').value);
+            if(isNaN(amt) || amt < 1) return alert("Minimum bet is 1!");
+
+            if(activeUserBets[selectedTab] !== null) {
+                return alert(`You already have an active bet in the ${selectedTab}s market!`);
+            }
+
+            // Deduct from GAMING WALLET only
+            if(selectedCurrency === "USDT") {
+                if(amt > gameUSDT) return alert("Insufficient USDT in Gaming Wallet! Transfer from Main Wallet first.");
+                gameUSDT -= amt;
+            } else {
+                if(amt > gameSUC) return alert("Insufficient SUC in Gaming Wallet! Transfer from Main Wallet first.");
+                gameSUC -= amt;
+            }
+            updateBalanceUI();
+            saveToDB();
+
+            activeUserBets[selectedTab] = { amount: amt, currency: selectedCurrency, direction: direction };
+            addBetToFeed("YOU (Active)", amt, selectedCurrency, direction, true);
+        }
+
+        // --- RESOLVE ROUND ---
+        function resolveRound(timeframe) {
+            let userBet = activeUserBets[timeframe];
+            if(userBet !== null) {
+                let isWin = Math.random() > 0.5; // 50/50 Chance Demo
+                
+                if(isWin) {
+                    let profit = userBet.amount * 1.8; // 80% Profit
+                    if(userBet.currency === "USDT") gameUSDT += profit; else gameSUC += profit;
+                    alert(`✅ ${timeframe}s Round Ended: YOU WON!\n\nProfit: +${profit.toFixed(2)} ${userBet.currency}\nAdded to Gaming Wallet.`);
+                } else {
+                    alert(`❌ ${timeframe}s Round Ended: YOU LOST!\n\nLost: -${userBet.amount} ${userBet.currency}`);
+                }
+                
+                updateBalanceUI();
+                saveToDB();
+                activeUserBets[timeframe] = null;
+            }
+        }
+
+        function saveToDB() {
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            savedUser.stsTokens = mainSUC;
+            savedUser.usdtBalance = mainUSDT;
+            savedUser.gameSUC = gameSUC;
+            savedUser.gameUSDT = gameUSDT;
+            localStorage.setItem('stsUser', JSON.stringify(savedUser));
+        }
+
+        // --- INFINITE BOT FEED ---
+        function startFakeBots() {
+            setInterval(() => {
+                let fakeNames = ["UID: 99**12", "UID: 41**88", "UID: 12**09", "UID: 77**34", "UID: 55**21", "UID: 89**99", "UID: 10**02"];
+                let name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+                let amt = Math.floor(Math.random() * 500) + 10;
+                let curr = Math.random() > 0.5 ? "USDT" : "SUC";
+                let dir = Math.random() > 0.5 ? "UP" : "DOWN";
+                
+                addBetToFeed(name, amt, curr, dir, false);
+            }, 1000); // 1 bet every second
+        }
+
+        function addBetToFeed(user, amount, curr, dir, isMe) {
+            let list = document.getElementById('bets-list');
+            let dirHTML = dir === 'UP' ? '<span class="bet-dir up">UP 📈</span>' : '<span class="bet-dir down">DOWN 📉</span>';
+            let rowClass = isMe ? "bet-row my-bet" : "bet-row";
+            
+            let html = `<div class="${rowClass}"><span class="bet-user">${user}</span><span class="bet-amt">${amount} ${curr}</span>${dirHTML}</div>`;
+            list.insertAdjacentHTML('afterbegin', html);
+
+            if(list.children.length > 50) list.removeChild(list.lastChild);
+        }
+    </script>
+</body>
+</html>

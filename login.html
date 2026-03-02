@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Smart Universe</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* हेडर */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .logo { display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px; }
+        .logo img { height: 35px; margin-right: 10px; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+
+        /* लॉगिन सेक्शन डिज़ाइन */
+        .auth-section { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px 20px; background: radial-gradient(circle at center, #151a25 0%, #0b0e14 100%); }
+        .auth-box { background: #151a25; border: 1px solid #2a2f3a; border-radius: 12px; padding: 40px; width: 100%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); text-align: center; position: relative; overflow: hidden;}
+        
+        /* ऊपर का गोल्डन बॉर्डर इफेक्ट */
+        .auth-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #f3ba2f, #00ff88); }
+
+        .auth-box h2 { color: #fff; margin-bottom: 10px; font-size: 28px; }
+        .auth-box h2 span { color: #f3ba2f; }
+        .auth-box p { color: #a0a5b1; margin-bottom: 30px; font-size: 14px; }
+        
+        /* इनपुट फील्ड्स */
+        .input-group { text-align: left; margin-bottom: 20px; }
+        .input-group label { display: block; color: #e2e8f0; margin-bottom: 8px; font-size: 13px; font-weight: bold; letter-spacing: 0.5px;}
+        .input-group input { width: 100%; background: #0b0e14; border: 1px solid #2a2f3a; color: #fff; padding: 14px 15px; border-radius: 8px; outline: none; font-size: 15px; transition: 0.3s;}
+        .input-group input:focus { border-color: #f3ba2f; box-shadow: 0 0 10px rgba(243,186,47,0.2); }
+        .input-group input::placeholder { color: #4a5568; }
+        
+        /* बटन */
+        .submit-btn { width: 100%; background: #f3ba2f; color: #000; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;}
+        .submit-btn:hover { background: #e5a920; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(243,186,47,0.4);}
+        
+        /* फूटर लिंक्स */
+        .auth-footer { margin-top: 25px; color: #a0a5b1; font-size: 14px; }
+        .auth-footer a { color: #00ff88; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .auth-footer a:hover { text-decoration: underline; text-shadow: 0 0 10px rgba(0,255,136,0.4); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo"> 
+            SMART UNIVERSE <span style="font-size: 12px; color: #00ff88; margin-left: 5px;">(SUC)</span>
+        </div>
+        <div class="auth-buttons">
+            <button class="login-btn" onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+    </header>
+
+    <section class="auth-section">
+        <div class="auth-box">
+            <h2>Welcome to <span>Universe</span></h2>
+            <p>Login to access your Web3 Dashboard</p>
+            
+            <form id="loginForm" onsubmit="loginUser(event)">
+                <div class="input-group">
+                    <label>Email / Mobile Number / SUC ID</label>
+                    <input type="text" id="login-id" placeholder="Enter Email, Mobile, or SUC-ID" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="login-pass" placeholder="Enter your secure password" required>
+                </div>
+                <button type="submit" class="submit-btn">Secure Login</button>
+            </form>
+
+            <p class="auth-footer">Don't have an account? <a href="register.html">Register here</a></p>
+        </div>
+    </section>
+
+    <script>
+        function loginUser(event) {
+            event.preventDefault(); // पेज को रीफ्रेश होने से रोकना
+            
+            let loginInput = document.getElementById('login-id').value;
+            let loginPass = document.getElementById('login-pass').value;
+            
+            // डेटाबेस (LocalStorage) से डेटा निकालना 
+            // (पुरानी DB key 'stsUser' ही रखी है ताकि पुराना डेटा डिलीट न हो)
+            let savedUser = JSON.parse(localStorage.getItem('stsUser'));
+
+            if (!savedUser) {
+                alert("❌ No account found! Please register first.");
+                return;
+            }
+
+            // SUC ID से मैच कराने के लिए अगर यूज़र 'SUC-' लगाकर डालता है तो उसे भी चेक करें
+            let pureId = loginInput.replace("SUC-", "STS"); 
+
+            // चेक करना कि क्या जानकारी Email, Mobile या ID से मैच करती है
+            let isIdValid = (loginInput === savedUser.email || loginInput === savedUser.mobile || loginInput === savedUser.stsId || pureId === savedUser.stsId);
+            let isPassValid = (loginPass === savedUser.password);
+
+            if (isIdValid && isPassValid) {
+                alert("🚀 Login Successful!\n\nWelcome to Smart Universe, " + savedUser.name + "!");
+                
+                // डैशबोर्ड पर रीडायरेक्ट
+                window.location.href = "dashboard.html"; 
+            } else {
+                alert("❌ Invalid Login ID or Password. Please try again.");
+            }
+        }
+    </script>
+</body>
+</html>

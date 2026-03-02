@@ -1,0 +1,479 @@
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+body { background-color: #0b0e14; color: #ffffff; overflow-x: hidden; }
+
+/* Header */
+header { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+.logo { font-size: 24px; font-weight: bold; color: #f3ba2f; }
+.auth-buttons button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 10px; }
+.login-btn { background-color: transparent; color: #ffffff; border: 1px solid #f3ba2f; }
+.register-btn { background-color: #f3ba2f; color: #000; }
+.cta-btn { padding: 12px 25px; background: #f3ba2f; border: none; font-weight: bold; border-radius: 5px; margin-top: 15px; cursor: pointer; }
+
+/* --- 3D Banners --- */
+.slider-section { position: relative; width: 100%; height: 350px; overflow: hidden; background-color: #0b0e14; }
+.slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: space-around; align-items: center; opacity: 0; transition: opacity 1s ease-in-out; padding: 0 10%; }
+.slide.active { opacity: 1; z-index: 2; }
+
+/* अलग-अलग बैनर के लिए ग्रेडिएंट (3D लुक) */
+.banner-1 { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+.banner-2 { background: linear-gradient(135deg, #4b134f 0%, #c94b4b 100%); }
+.banner-3 { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+
+.banner-content h1 { font-size: 45px; margin-bottom: 10px; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+.banner-content p { font-size: 18px; color: #f0f0f0; }
+
+/* हवा में तैरने वाला आइकॉन (Floating Animation) */
+.floating-icon { font-size: 100px; filter: drop-shadow(0px 10px 10px rgba(0,0,0,0.5)); animation: floatUpDown 3s ease-in-out infinite; }
+@keyframes floatUpDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* --- सिंगल कॉइन लाइन (Seamless Marquee) --- */
+.ticker-section { background-color: #151a25; padding: 15px 0; border-bottom: 1px solid #2a2f3a; border-top: 1px solid #2a2f3a; }
+.marquee-wrapper { width: 100%; overflow: hidden; display: flex; white-space: nowrap; }
+.crypto-track { display: flex; gap: 30px; padding-left: 30px; animation: scroll-left 15s linear infinite; }
+.crypto-track:hover { animation-play-state: paused; }
+
+@keyframes scroll-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); } /* यह बिना रुके लूप बनाएगा */
+}
+
+.card { display: flex; align-items: center; gap: 10px; background: #0b0e14; padding: 10px 20px; border-radius: 8px; border: 1px solid #2a2f3a; min-width: 220px; }
+.card img { width: 35px; height: 35px; border-radius: 50%; }
+.card-info h3 { font-size: 14px; color: #a0a5b1; }
+.card-info .price { font-size: 16px; font-weight: bold; color: #00ff88; }
+
+/* --- नए फीचर्स सेक्शन (Gaming, Refer, Profit) --- */
+.features-section { display: flex; justify-content: center; gap: 20px; padding: 50px 20px; flex-wrap: wrap; }
+.feature-box { background: #151a25; padding: 30px 20px; text-align: center; border-radius: 15px; width: 180px; border: 1px solid #2a2f3a; transition: all 0.3s ease; cursor: pointer; }
+.feature-box:hover { 
+    transform: translateY(-10px) scale(1.05); /* 3D पॉप-अप इफ़ेक्ट */
+    box-shadow: 0px 10px 20px rgba(243, 186, 47, 0.2); 
+    border-color: #f3ba2f;
+}
+.f-icon { font-size: 50px; margin-bottom: 15px; }
+.feature-box h3 { color: #ffffff; font-size: 18px; margin-bottom: 5px; }
+.feature-box p { color: #a0a5b1; font-size: 13px; }
+/* भाषा बदलने का बटन (Language Switcher) */
+#lang-switch {
+    background-color: #151a25;
+    color: #ffffff;
+    border: 1px solid #2a2f3a;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#lang-switch:focus {
+    outline: none;
+    border-color: #f3ba2f;
+}
+/* --- Register & Login Page Design (पुराना वाला वापस) --- */
+.auth-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 50px 20px;
+}
+
+.auth-box {
+    background-color: #151a25;
+    padding: 40px;
+    border-radius: 10px;
+    border: 1px solid #2a2f3a;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+}
+
+.auth-box h2 { color: #f3ba2f; margin-bottom: 10px; }
+.auth-box p { color: #a0a5b1; margin-bottom: 25px; font-size: 14px; }
+
+.input-group { text-align: left; margin-bottom: 20px; }
+.input-group label { display: block; margin-bottom: 8px; color: #ffffff; font-size: 14px; }
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #2a2f3a;
+    background-color: #0b0e14;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.input-group input:focus { outline: none; border-color: #f3ba2f; }
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #f3ba2f;
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.submit-btn:hover { background-color: #e5a920; }
+
+.auth-footer { margin-top: 20px; font-size: 14px; }
+.auth-footer a { color: #f3ba2f; text-decoration: none; }
+.auth-footer a:hover { text-decoration: underline; }
+
+/* OTP Button */
+.otp-btn {
+    background-color: #2a2f3a;
+    color: #ffffff;
+    border: 1px solid #f3ba2f;
+    padding: 0 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.otp-btn:hover { background-color: #f3ba2f; color: #000; }
+/* --- Header Login & Register Button Fix --- */
+.header-right button, .auth-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.login-btn {
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #f3ba2f; /* गोल्ड बॉर्डर */
+}
+
+.login-btn:hover {
+    background-color: rgba(243, 186, 47, 0.1); /* माउस ले जाने पर हल्का इफ़ेक्ट */
+}
+
+.register-btn {
+    background-color: #f3ba2f; /* गोल्ड बैकग्राउंड */
+    color: #000000;
+}
+
+.register-btn:hover {
+    background-color: #e5a920;
+}
+/* --- Dashboard Page Design --- */
+.dashboard-section {
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-container {
+    width: 100%;
+    max-width: 900px;
+}
+
+.dash-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #2a2f3a;
+    padding-bottom: 20px;
+}
+
+.dash-header h2 {
+    color: #ffffff;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.wallet-card {
+    background: linear-gradient(135deg, #151a25 0%, #0b0e14 100%);
+    border: 1px solid #f3ba2f; /* गोल्ड बॉर्डर */
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 40px;
+    box-shadow: 0 5px 20px rgba(243, 186, 47, 0.1);
+}
+
+.wallet-card h3 {
+    color: #a0a5b1;
+    font-weight: normal;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.wallet-card .balance {
+    font-size: 50px;
+    color: #00ff88; /* ग्रीन कलर प्रॉफिट के लिए */
+    margin-bottom: 30px;
+}
+
+.wallet-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.action-btn {
+    padding: 12px 35px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.action-btn.deposit {
+    background-color: #f3ba2f;
+    color: #000;
+}
+
+.action-btn.deposit:hover {
+    background-color: #e5a920;
+}
+
+.action-btn.withdraw {
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #f3ba2f;
+}
+
+.action-btn.withdraw:hover {
+    background-color: rgba(243, 186, 47, 0.1);
+}
+
+.dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.dash-box {
+    background-color: #151a25;
+    border: 1px solid #2a2f3a;
+    padding: 30px 20px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dash-box:hover {
+    border-color: #f3ba2f;
+    transform: translateY(-5px); /* माउस ले जाने पर ऊपर उठने का इफ़ेक्ट */
+}
+
+.dash-box h3 {
+    color: #ffffff;
+    font-size: 16px;
+    margin-top: 15px;
+}
+/* --- INR Balance & Deposit Page Design --- */
+.inr-balance {
+    font-size: 16px;
+    color: #a0a5b1;
+    margin-top: -20px;
+    margin-bottom: 30px;
+}
+
+.deposit-box {
+    background-color: #151a25;
+    padding: 30px;
+    border-radius: 10px;
+    border: 1px solid #2a2f3a;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.search-bar {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #2a2f3a;
+    background-color: #0b0e14;
+    color: #ffffff;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.search-bar:focus {
+    outline: none;
+    border-color: #f3ba2f;
+}
+
+.coin-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.coin-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #2a2f3a;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.coin-item:hover {
+    background-color: #0b0e14;
+    border-left: 3px solid #f3ba2f;
+}
+
+.coin-icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.coin-details h4 {
+    color: #ffffff;
+    font-size: 16px;
+    margin-bottom: 3px;
+}
+
+.coin-details p {
+    color: #a0a5b1;
+    font-size: 12px;
+}
+/* --- Real Coin Icons Design --- */
+.real-coin-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: contain;
+    background-color: #ffffff; /* कुछ कॉइन्स के बैकग्राउंड ट्रांसपेरेंट होते हैं, उन्हें उभारने के लिए */
+    padding: 2px;
+}
+/* --- Payment Page Design --- */
+.payment-box {
+    background-color: #151a25;
+    padding: 30px;
+    border-radius: 10px;
+    border: 1px solid #2a2f3a;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.qr-section {
+    text-align: center;
+    background-color: #0b0e14;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #2a2f3a;
+    margin-bottom: 25px;
+}
+
+.qr-image {
+    width: 150px;
+    height: 150px;
+    border: 3px solid #f3ba2f;
+    border-radius: 8px;
+    padding: 5px;
+    background-color: white;
+}
+
+.address-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #151a25;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: 1px solid #2a2f3a;
+    margin-top: 10px;
+    font-family: monospace;
+    font-size: 14px;
+    color: #00ff88;
+}
+
+.copy-btn {
+    background-color: #2a2f3a;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.copy-btn:hover {
+    background-color: #f3ba2f;
+    color: #000;
+}
+
+.proof-form .input-group {
+    margin-bottom: 15px;
+}
+/* --- Investment Plans Design --- */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.plan-card {
+    background-color: #151a25;
+    border: 1px solid #2a2f3a;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.plan-card:hover {
+    border-color: #f3ba2f;
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(243, 186, 47, 0.1);
+}
+
+.plan-title {
+    color: #f3ba2f;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.plan-roi {
+    font-size: 36px;
+    font-weight: bold;
+    color: #00ff88;
+    margin-bottom: 20px;
+}
+
+.plan-details {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 25px;
+    color: #a0a5b1;
+}
+
+.plan-details li {
+    margin-bottom: 12px;
+    border-bottom: 1px solid #2a2f3a;
+    padding-bottom: 12px;
+    font-size: 15px;
+}
+
+.plan-details li:last-child {
+    border-bottom: none;
+}
+/* पोर्टफोलियो और वॉलेट पॉप-अप के लिए नया स्टाइल */
+.wallet-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+.wallet-modal { background: #151a25; width: 90%; max-width: 420px; padding: 25px; border-radius: 15px; border: 1px solid #f3ba2f; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+.wallet-option-btn { width: 100%; background: #0b0e14; border: 1px solid #2a2f3a; color: #fff; padding: 15px; border-radius: 10px; margin-bottom: 12px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
+.portfolio-box { background: #0b0e14; border: 1px solid #2a2f3a; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: left; }
+.coin-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #2a2f3a; }

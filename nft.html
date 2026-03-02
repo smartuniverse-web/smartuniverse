@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFT Royalty & Metaverse - Smart Universe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; }
+
+        /* हेडर (बाकी पेजों से मैच करता हुआ) */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .logo { display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px; }
+        .logo img { height: 35px; margin-right: 10px; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+
+        /* प्रीमियम स्लाइडिंग बैनर */
+        .premium-ticker {
+            background: linear-gradient(90deg, #151a25, #2a2f3a, #151a25);
+            border-top: 1px solid #f3ba2f; border-bottom: 1px solid #f3ba2f;
+            padding: 12px 0; overflow: hidden; white-space: nowrap; display: flex; align-items: center;
+            margin-bottom: 30px; box-shadow: 0 0 15px rgba(243, 186, 47, 0.2);
+        }
+        .ticker-content {
+            display: inline-block; padding-left: 100%; animation: scrollTicker 25s linear infinite;
+            color: #fff; font-size: 14px; font-weight: bold; letter-spacing: 1px;
+        }
+        .ticker-content span { margin-right: 40px; }
+        .ticker-content span strong { color: #00ff88; }
+        .ticker-content span i { color: #f3ba2f; font-style: normal; margin-right: 5px; }
+        @keyframes scrollTicker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* ट्रैकिंग डैशबोर्ड */
+        .qualification-box {
+            background: #0b0e14; border: 1px dashed #00ff88; padding: 20px; border-radius: 12px;
+            max-width: 600px; margin: 0 auto 40px auto; text-align: center;
+        }
+        .qualification-box h3 { color: #00ff88; margin-bottom: 15px; font-size: 18px; text-transform: uppercase; }
+        .stats-grid { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 15px; }
+        .stat-card { background: #151a25; border: 1px solid #2a2f3a; padding: 15px; border-radius: 8px; flex: 1; }
+        .stat-card h4 { color: #a0a5b1; font-size: 12px; margin-bottom: 5px; }
+        .stat-card .val { color: #fff; font-size: 24px; font-weight: bold; }
+        
+        .sim-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .sim-btn { background: #2a2f3a; color: #fff; border: 1px solid #f3ba2f; padding: 8px 12px; font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.3s; }
+        .sim-btn:hover { background: #f3ba2f; color: #000; }
+
+        /* NFT कार्ड्स डिज़ाइन */
+        .nft-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; padding: 0 20px; max-width: 1100px; margin: 0 auto; }
+        .nft-card { background: #151a25; border: 2px solid #2a2f3a; border-radius: 15px; padding: 20px; text-align: center; position: relative; transition: all 0.4s; overflow: hidden; }
+        
+        /* असली NFT जैसा लुक */
+        .nft-art {
+            width: 100%; height: 200px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; font-size: 70px;
+            background: linear-gradient(135deg, #2a2f3a, #0b0e14); border: 2px solid #333; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .nft-art::after { content: "SUC EXCLUSIVE"; position: absolute; bottom: 10px; font-size: 10px; color: rgba(255,255,255,0.3); font-weight: bold; letter-spacing: 2px; }
+        
+        .nft-name { color: #fff; font-size: 20px; font-weight: bold; margin-bottom: 5px; letter-spacing: 1px;}
+        .nft-roi { color: #f3ba2f; font-size: 13px; font-weight: bold; margin-bottom: 15px; background: rgba(243, 186, 47, 0.1); padding: 5px; border-radius: 5px; }
+        .nft-condition { font-size: 12px; color: #a0a5b1; margin-bottom: 15px; text-align: left; background: #0b0e14; padding: 10px; border-radius: 5px; border-left: 3px solid #00ff88; }
+        
+        .nft-status { font-size: 14px; font-weight: bold; padding: 10px; border-radius: 5px; display: block; width: 100%; box-sizing: border-box; }
+        
+        /* Locked vs Unlocked Classes */
+        .locked .nft-art { filter: grayscale(100%) opacity(0.4); }
+        .locked { border-color: #2a2f3a; }
+        .status-locked { background: #2a2f3a; color: #a0a5b1; }
+        
+        .unlocked { border-color: #00ff88; box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2); transform: translateY(-5px); }
+        .unlocked .nft-art { border-color: #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+        .status-unlocked { background: #00ff88; color: #000; box-shadow: 0 0 15px rgba(0, 255, 136, 0.5); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo"> 
+            SMART UNIVERSE <span style="font-size: 12px; color: #00ff88; margin-left: 5px;">(SUC)</span>
+        </div>
+        <button class="login-btn" onclick="window.location.href='dashboard.html'">Back</button>
+    </header>
+
+    <section class="auth-section" style="display: block; padding-top: 20px; padding-bottom: 60px;">
+        
+        <div class="premium-ticker">
+            <div class="ticker-content">
+                <span><i>🔥</i> <strong>BREAKING:</strong> NFT Holders will receive Daily ROI from Global Company Turnover!</span>
+                <span><i>🌐</i> <strong>METAVERSE AHEAD:</strong> Your NFT acts as a VIP Pass to the upcoming Smart Universe Virtual World!</span>
+                <span><i>📈</i> <strong>VALUE SURGE:</strong> The floor price of SUC NFTs is expected to grow 100x after launch!</span>
+                <span><i>💎</i> <strong>ROYALTY:</strong> Achieve Crown Ambassador NFT for Lifetime 5% Company Pool Sharing!</span>
+            </div>
+        </div>
+
+        <h2 style="color: #f3ba2f; text-align: center; font-size: 32px; margin-bottom: 10px; text-transform: uppercase;">NFT Royalty Program</h2>
+        <p style="text-align: center; color: #a0a5b1; margin-bottom: 30px;">Build a strong network to mint exclusive SUC NFTs and secure your future in the Metaverse.</p>
+
+        <div class="qualification-box">
+            <h3>📊 Your Live Eligibility Tracker</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Your Max Unlocked Slot</h4>
+                    <div class="val" id="my-slot-val" style="color: #00ff88;">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Qualified Directs (Leaders)</h4>
+                    <div class="val" id="directs-val" style="color: #f3ba2f;">0</div>
+                </div>
+            </div>
+            <p style="font-size: 11px; color: #a0a5b1; margin-bottom: 15px;">* Simulation Tool: Add dummy directs below to see how NFTs magically unlock!</p>
+            <div class="sim-buttons">
+                <button class="sim-btn" onclick="simDirect(6)">+1 Direct (Slot 6)</button>
+                <button class="sim-btn" onclick="simDirect(8)">+1 Direct (Slot 8)</button>
+                <button class="sim-btn" onclick="simDirect(10)">+1 Direct (Slot 10)</button>
+                <button class="sim-btn" onclick="simDirect(12)">+1 Direct (Slot 12)</button>
+                <button class="sim-btn" style="border-color: #ff4d4d; color: #ff4d4d;" onclick="resetSim()">Reset Data</button>
+            </div>
+        </div>
+
+        <div class="nft-grid">
+            
+            <div class="nft-card locked" id="nft-1">
+                <div class="nft-art" style="background: linear-gradient(135deg, #434343, #000000);">🐺</div>
+                <div class="nft-name">Silver Alpha NFT</div>
+                <div class="nft-roi">🎁 Reward: 1% Company Turnover ROI</div>
+                <div class="nft-condition">
+                    <strong>Condition to Mint:</strong><br>
+                    1. You must activate <strong>Slot 6</strong>.<br>
+                    2. You need <strong>2 Directs</strong> with Slot 6 active.
+                </div>
+                <div class="nft-status status-locked" id="status-1">🔒 Locked</div>
+            </div>
+
+            <div class="nft-card locked" id="nft-2">
+                <div class="nft-art" style="background: linear-gradient(135deg, #e6c27a, #8a6224);">🦅</div>
+                <div class="nft-name">Gold Falcon NFT</div>
+                <div class="nft-roi">🎁 Reward: 2% Company Turnover ROI</div>
+                <div class="nft-condition">
+                    <strong>Condition to Mint:</strong><br>
+                    1. You must activate <strong>Slot 8</strong>.<br>
+                    2. You need <strong>2 Directs</strong> with Slot 8 active.
+                </div>
+                <div class="nft-status status-locked" id="status-2">🔒 Locked</div>
+            </div>
+
+            <div class="nft-card locked" id="nft-3">
+                <div class="nft-art" style="background: linear-gradient(135deg, #00f2fe, #4facfe);">💎</div>
+                <div class="nft-name">Diamond Node NFT</div>
+                <div class="nft-roi">🎁 Reward: 3% ROI + Metaverse Avatar</div>
+                <div class="nft-condition">
+                    <strong>Condition to Mint:</strong><br>
+                    1. You must activate <strong>Slot 10</strong>.<br>
+                    2. You need <strong>2 Directs</strong> with Slot 10 active.
+                </div>
+                <div class="nft-status status-locked" id="status-3">🔒 Locked</div>
+            </div>
+
+            <div class="nft-card locked" id="nft-4">
+                <div class="nft-art" style="background: linear-gradient(135deg, #f093fb, #f5576c);">👑</div>
+                <div class="nft-name">Crown Ambassador</div>
+                <div class="nft-roi">🎁 Reward: 5% ROI + Metaverse Land</div>
+                <div class="nft-condition">
+                    <strong>Condition to Mint:</strong><br>
+                    1. You must activate <strong>Slot 12</strong>.<br>
+                    2. You need <strong>2 Directs</strong> with Slot 12 active.
+                </div>
+                <div class="nft-status status-locked" id="status-4">🔒 Locked</div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <script>
+        let myMaxSlot = 0;
+        let myDirects = { 6: 0, 8: 0, 10: 0, 12: 0 };
+
+        window.onload = function() {
+            // DB key wahi rakhi hai taaki purana code break na ho
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            let unlockedSlots = savedUser.unlockedSlots || [];
+            
+            if(unlockedSlots.length > 0) {
+                myMaxSlot = Math.max(...unlockedSlots);
+            }
+            
+            let savedDirects = JSON.parse(localStorage.getItem('stsDirectsData'));
+            if(savedDirects) myDirects = savedDirects;
+
+            updateUI();
+        };
+
+        function simDirect(slotLevel) {
+            if(slotLevel >= 6) myDirects[6]++;
+            if(slotLevel >= 8) myDirects[8]++;
+            if(slotLevel >= 10) myDirects[10]++;
+            if(slotLevel >= 12) myDirects[12]++;
+            
+            localStorage.setItem('stsDirectsData', JSON.stringify(myDirects));
+            updateUI();
+        }
+
+        function resetSim() {
+            myDirects = { 6: 0, 8: 0, 10: 0, 12: 0 };
+            localStorage.setItem('stsDirectsData', JSON.stringify(myDirects));
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('my-slot-val').innerText = myMaxSlot;
+            document.getElementById('directs-val').innerText = myDirects[6];
+
+            checkUnlock(1, 6, myDirects[6]);
+            checkUnlock(2, 8, myDirects[8]);
+            checkUnlock(3, 10, myDirects[10]);
+            checkUnlock(4, 12, myDirects[12]);
+        }
+
+        function checkUnlock(nftId, reqSlot, directsCount) {
+            let card = document.getElementById(`nft-${nftId}`);
+            let status = document.getElementById(`status-${nftId}`);
+
+            if (myMaxSlot >= reqSlot && directsCount >= 2) {
+                if(card.classList.contains('locked')) {
+                    card.classList.remove('locked');
+                    card.classList.add('unlocked');
+                    status.classList.remove('status-locked');
+                    status.classList.add('status-unlocked');
+                    status.innerHTML = "✅ Minted & Active!";
+                    
+                    setTimeout(() => { alert(`🎉 INCREDIBLE! You have successfully Minted NFT Level ${nftId}!`); }, 300);
+                }
+            } else {
+                card.classList.add('locked');
+                card.classList.remove('unlocked');
+                status.classList.add('status-locked');
+                status.classList.remove('status-unlocked');
+                status.innerHTML = "🔒 Locked";
+            }
+        }
+    </script>
+</body>
+</html>

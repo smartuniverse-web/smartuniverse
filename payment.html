@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Payment - STS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">STS <span style="font-size: 14px; color: #ffffff; font-weight: normal;">- Smart Trading Solutions</span></div>
+        <div class="auth-buttons">
+            <button class="login-btn" onclick="window.location.href='deposit.html'">Back</button>
+        </div>
+    </header>
+
+    <section class="auth-section">
+        <div class="payment-box">
+            <h2 style="color: #f3ba2f; margin-bottom: 5px; text-align: center;">Deposit <span id="pay-coin-name">...</span></h2>
+            <p style="text-align: center; color: #a0a5b1; margin-bottom: 20px;">Scan QR or Copy Address to Pay</p>
+            
+            <div class="qr-section">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YourPaymentAddressHere" alt="QR Code" class="qr-image">
+                <p id="pay-instruction" style="margin-top: 15px; font-size: 14px; color: #a0a5b1;">Send exactly to this address:</p>
+                
+                <div class="address-box">
+                    <span id="pay-address">Loading address...</span>
+                    <button class="copy-btn" onclick="copyAddress()">Copy</button>
+                </div>
+            </div>
+
+            <form id="paymentForm" onsubmit="submitPayment(event)" class="proof-form">
+                
+                <div class="input-group">
+                    <label id="amount-label">Amount Sent</label>
+                    <input type="number" id="pay-amount" placeholder="Loading minimum limit..." required>
+                </div>
+                
+                <div class="input-group">
+                    <label id="tx-label">Transaction ID / UTR No.</label>
+                    <input type="text" id="pay-txid" placeholder="Enter 12-digit UTR or Tx Hash" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Upload Payment Screenshot</label>
+                    <input type="file" id="pay-proof" accept="image/*" required style="padding: 8px;">
+                </div>
+
+                <button type="submit" class="submit-btn">Submit for Verification</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedCoin = urlParams.get('coin') || 'Crypto';
+
+        document.getElementById('pay-coin-name').innerText = selectedCoin;
+
+        // आपका फिक्स रेट (1 USDT = ₹95 डिपॉजिट के लिए)
+        const minUsdt = 10;
+        const depositRateInr = 95; 
+        const minInrLimit = minUsdt * depositRateInr; // 950 रुपये
+
+        let currentMinLimit = minUsdt;
+
+        // UI सेट करना
+        if (selectedCoin === 'INR') {
+            currentMinLimit = minInrLimit;
+            document.getElementById('pay-address').innerText = "sts-company@ybl"; 
+            document.getElementById('pay-instruction').innerText = "Pay via PhonePe / GPay / Paytm to this UPI ID:";
+            document.getElementById('tx-label').innerText = "Enter 12-Digit UTR Number";
+            document.getElementById('amount-label').innerText = `Amount Sent in INR (Min: ₹${currentMinLimit})`;
+            document.getElementById('pay-amount').placeholder = `Minimum ₹${currentMinLimit} required`;
+        } else {
+            currentMinLimit = minUsdt;
+            document.getElementById('pay-address').innerText = "0x1234abcd...yourcryptoaddress...5678"; 
+            document.getElementById('pay-instruction').innerText = `Send only ${selectedCoin} on the supported network:`;
+            document.getElementById('tx-label').innerText = "Enter Transaction Hash (TxID)";
+            document.getElementById('amount-label').innerText = `Amount Sent in ${selectedCoin} (Min: ${currentMinLimit})`;
+            document.getElementById('pay-amount').placeholder = `Minimum ${currentMinLimit} ${selectedCoin} required`;
+        }
+        
+        document.getElementById('pay-amount').min = currentMinLimit;
+
+        function copyAddress() {
+            let addr = document.getElementById('pay-address').innerText;
+            navigator.clipboard.writeText(addr);
+            alert("Address Copied!");
+        }
+
+        // 🔥 THE MAGIC CONNECTING CODE 🔥
+        function submitPayment(event) {
+            event.preventDefault();
+            let amount = parseFloat(document.getElementById('pay-amount').value);
+            let txid = document.getElementById('pay-txid').value;
+            
+            if(amount < currentMinLimit) {
+                alert(`Error: Minimum deposit amount is ${currentMinLimit}.`);
+                return;
+            }
+
+            // 1. यूज़र की ID निकालना
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || { stsId: 'GUEST-USER' };
+            
+            // 2. एडमिन के डेटाबेस (localStorage) को बुलाना
+            let pendingDeposits = JSON.parse(localStorage.getItem('adminPendingDeposits')) || [];
+
+            // 3. अगर पेमेंट INR में है, तो उसे USDT में बदलना ताकि एडमिन को आसानी हो
+            let finalUsdtAmount = amount;
+            let displayCoin = selectedCoin;
+            
+            if(selectedCoin === 'INR') {
+                finalUsdtAmount = (amount / depositRateInr).toFixed(2);
+                displayCoin = `USDT (Paid ₹${amount})`;
+            }
+
+            // 4. नई रिक्वेस्ट बनाना
+            let newRequest = {
+                id: Date.now(), // Unique Request ID
+                userId: savedUser.stsId,
+                amount: finalUsdtAmount, // USDT value
+                coin: displayCoin,
+                txHash: txid,
+                date: new Date().toLocaleDateString()
+            };
+
+            // 5. रिक्वेस्ट को एडमिन के पेंडिंग लिस्ट में डालना
+            pendingDeposits.push(newRequest);
+            localStorage.setItem('adminPendingDeposits', JSON.stringify(pendingDeposits));
+
+            alert("✅ Payment proof submitted successfully!\n\nYour request has been sent to the Admin. It will reflect in your dashboard once approved.");
+            
+            // डैशबोर्ड पर वापस भेजना
+            window.location.href = "dashboard.html"; 
+        }
+    </script>
+</body>
+</html>

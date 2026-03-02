@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Smart Universe</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* हेडर */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .logo { display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px; }
+        .logo img { height: 35px; margin-right: 10px; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+
+        .auth-section { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px 20px; background: radial-gradient(circle at center, #151a25 0%, #0b0e14 100%); }
+        .auth-box { background: #151a25; border: 1px solid #2a2f3a; border-radius: 12px; padding: 40px; width: 100%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); position: relative; overflow: hidden;}
+        
+        .auth-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #f3ba2f, #00ff88); }
+        .auth-box h2 { color: #fff; margin-bottom: 5px; font-size: 28px; text-align: center;}
+        .auth-box p { color: #a0a5b1; margin-bottom: 25px; font-size: 14px; text-align: center;}
+        
+        .input-group { margin-bottom: 18px; }
+        .input-group label { display: block; color: #e2e8f0; margin-bottom: 6px; font-size: 12px; font-weight: bold; letter-spacing: 0.5px;}
+        .input-group input { width: 100%; background: #0b0e14; border: 1px solid #2a2f3a; color: #fff; padding: 12px 15px; border-radius: 8px; outline: none; font-size: 14px; transition: 0.3s;}
+        .input-group input:focus { border-color: #f3ba2f; box-shadow: 0 0 10px rgba(243,186,47,0.2); }
+        
+        #reg-sponsor { border-color: #00ff88; color: #00ff88; font-weight: bold; background: rgba(0,255,136,0.05); }
+
+        .submit-btn { width: 100%; background: #f3ba2f; color: #000; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;}
+        .submit-btn:hover { background: #e5a920; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(243,186,47,0.4);}
+        
+        .auth-footer { margin-top: 20px; color: #a0a5b1; font-size: 14px; text-align: center;}
+        .auth-footer a { color: #00ff88; text-decoration: none; font-weight: bold; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo"> 
+            SMART UNIVERSE <span style="font-size: 12px; color: #00ff88; margin-left: 5px;">(SUC)</span>
+        </div>
+        <div class="auth-buttons">
+            <button class="login-btn" onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+    </header>
+
+    <section class="auth-section">
+        <div class="auth-box">
+            <h2>Create Account</h2>
+            <p>Enter details to join the Universe</p>
+            
+            <form id="registerForm" onsubmit="registerUser(event)">
+                
+                <div class="input-group">
+                    <label>Sponsor / Referral ID</label>
+                    <input type="text" id="reg-sponsor" readonly>
+                </div>
+
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="reg-name" placeholder="Enter your full name" required>
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="reg-email" placeholder="Enter your email" required>
+                </div>
+                <div class="input-group">
+                    <label>Mobile Number</label>
+                    <input type="tel" id="reg-mobile" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-pass" placeholder="Create strong password" required>
+                </div>
+
+                <button type="submit" class="submit-btn">Register Now</button>
+            </form>
+
+            <p class="auth-footer">Already have an account? <a href="login.html">Login here</a></p>
+        </div>
+    </section>
+
+    <script>
+        // --- ऑटो-स्पॉन्सर लॉजिक ---
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refId = urlParams.get('ref');
+            
+            const defaultAdminId = "SUC-ADMIN"; 
+
+            if(refId) {
+                document.getElementById('reg-sponsor').value = refId;
+            } else {
+                document.getElementById('reg-sponsor').value = defaultAdminId;
+            }
+        };
+
+        function registerUser(event) {
+            event.preventDefault();
+            
+            let sponsor = document.getElementById('reg-sponsor').value;
+            let name = document.getElementById('reg-name').value;
+            let email = document.getElementById('reg-email').value;
+            let mobile = document.getElementById('reg-mobile').value;
+            let pass = document.getElementById('reg-pass').value;
+
+            // रैंडम ID जनरेट करना
+            let randomNum = Math.floor(100000 + Math.random() * 900000);
+            let sucId = "SUC-" + randomNum;
+
+            // डेटा सेव करना
+            let userData = { 
+                name, 
+                email, 
+                mobile, 
+                password: pass, 
+                stsId: sucId, 
+                sponsor: sponsor,
+                usdtBalance: 0.00,
+                stsTokens: 100 // जॉइनिंग बोनस
+            };
+            
+            localStorage.setItem('stsUser', JSON.stringify(userData));
+
+            alert(`✅ Registration Done!\n\nYour ID: ${sucId}\nSponsor: ${sponsor}`);
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>

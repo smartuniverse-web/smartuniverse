@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stake & ROI Earn - Smart Universe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; }
+
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .logo { display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px; }
+        .logo img { height: 35px; margin-right: 10px; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        
+        /* बैलेंस डिस्प्ले */
+        .bal-display { background: #151a25; border: 1px solid #2a2f3a; border-radius: 10px; padding: 15px 25px; margin-bottom: 30px; display: flex; justify-content: center; gap: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
+        .bal-box { text-align: center; }
+        .bal-box p { color: #a0a5b1; font-size: 13px; margin-bottom: 5px;}
+        .bal-box h3 { color: #fff; font-size: 22px;}
+        .bal-box h3 span { font-size: 14px; color: #f3ba2f;}
+        .bal-box.usdt h3 span { color: #00ff88;}
+
+        .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        
+        .plan-card { background-color: #151a25; border: 2px solid #2a2f3a; padding: 25px 20px; border-radius: 12px; text-align: center; transition: all 0.3s ease; position: relative; }
+        .locked-plan { border-color: #ff4d4d !important; opacity: 0.85; }
+        .unlocked-plan { border-color: #00ff88 !important; box-shadow: 0 0 15px rgba(0, 255, 136, 0.1);}
+        
+        .plan-title { color: #fff; font-size: 20px; margin-bottom: 10px; }
+        .plan-roi { font-size: 32px; font-weight: bold; color: #f3ba2f; margin-bottom: 15px; }
+        
+        .plan-details { list-style: none; text-align: left; margin-bottom: 20px; font-size: 14px; color: #e2e8f0;}
+        .plan-details li { margin-bottom: 10px; border-bottom: 1px dashed #2a2f3a; padding-bottom: 8px;}
+        .plan-details li:last-child { border-bottom: none; }
+        
+        /* Activation Fee Box */
+        .rule-box { background: rgba(0, 255, 136, 0.05); border: 1px dashed #00ff88; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px; text-align: center;}
+        .rule-box span { color: #00ff88; font-weight: bold;}
+        .rule-box .suc-text { color: #f3ba2f; font-weight: bold;}
+
+        .submit-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 15px;}
+        .locked-btn { background-color: #ff4d4d !important; color: #fff !important; }
+        .unlocked-btn { background-color: #00ff88 !important; color: #000 !important; }
+        .unlocked-btn:hover { background-color: #00cc6a !important; transform: translateY(-2px); }
+
+        @media(max-width: 768px) {
+            .bal-display { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo" style="height: 35px; margin-right: 10px; vertical-align: middle;"> 
+            SMART UNIVERSE <span style="font-size: 12px; color: #00ff88; margin-left: 5px;">(SUC)</span>
+        </div>
+        <button class="login-btn" onclick="window.location.href='dashboard.html'">Back</button>
+    </header>
+
+    <div class="container">
+        <h2 style="color: #f3ba2f; text-align: center; font-size: 32px; margin-bottom: 10px;">Stake & ROI Earn</h2>
+        <p style="text-align: center; color: #a0a5b1; margin-bottom: 30px;">
+            <strong style="color: #00ff88;">Tip:</strong> Active Classic Slots auto-unlock plans. Or pay 50% activation fee to unlock instantly!
+        </p>
+        
+        <div class="bal-display">
+            <div class="bal-box usdt">
+                <p>Available USDT</p>
+                <h3 id="display-usdt">0.00 <span>USDT</span></h3>
+            </div>
+            <div class="bal-box">
+                <p>Available SUC Tokens</p>
+                <h3 id="display-suc">0 <span>SUC</span></h3>
+            </div>
+            <div class="bal-box" style="border-left: 1px dashed #2a2f3a; padding-left: 40px;">
+                <p>SUC Presale Price</p>
+                <h3 style="color: #00ff88;">$0.10</h3>
+            </div>
+        </div>
+
+        <div class="plans-grid">
+            
+            <div class="plan-card" id="card-starter">
+                <h3 class="plan-title">Starter Plan</h3>
+                <div class="plan-roi">3% <span style="font-size: 16px; color: #a0a5b1;">Monthly</span></div>
+                <ul class="plan-details">
+                    <li>Duration: <strong style="color:#00ff88;">Min 30 Days to Unlimited</strong></li>
+                    <li>Invest Amount: <strong>Fixed $100</strong></li>
+                    <li style="color: #ff4d4d; font-size: 12px;">Required: Slot 3 OR Activation Fee</li>
+                    <div class="rule-box">
+                        Unlock Fee (If Slots Locked):<br>
+                        <span>$35 USDT</span> OR <span class="suc-text">350 SUC</span>
+                    </div>
+                </ul>
+                <button class="submit-btn" id="btn-starter">Loading...</button>
+            </div>
+
+            <div class="plan-card" id="card-basic">
+                <h3 class="plan-title">Basic Plan</h3>
+                <div class="plan-roi">6% <span style="font-size: 16px; color: #a0a5b1;">Monthly</span></div>
+                <ul class="plan-details">
+                    <li>Duration: <strong style="color:#00ff88;">Min 30 Days to Unlimited</strong></li>
+                    <li>Invest Amount: <strong>$101 - $500</strong></li>
+                    <li style="color: #ff4d4d; font-size: 12px;">Required: Slot 6 OR Activation Fee</li>
+                    <div class="rule-box">
+                        Unlock Fee (If Slots Locked):<br>
+                        <span>$315 USDT</span> OR <span class="suc-text">3150 SUC</span>
+                    </div>
+                </ul>
+                <button class="submit-btn" id="btn-basic">Loading...</button>
+            </div>
+
+            <div class="plan-card" id="card-premium">
+                <h3 class="plan-title">Premium Plan</h3>
+                <div class="plan-roi">9% <span style="font-size: 16px; color: #a0a5b1;">Monthly</span></div>
+                <ul class="plan-details">
+                    <li>Duration: <strong style="color:#00ff88;">Min 60 Days to Unlimited</strong></li>
+                    <li>Invest Amount: <strong>$501 - $5,000</strong></li>
+                    <li style="color: #ff4d4d; font-size: 12px;">Required: Slot 9 OR Activation Fee</li>
+                    <div class="rule-box">
+                        Unlock Fee (If Slots Locked):<br>
+                        <span>$2,555 USDT</span> OR <span class="suc-text">25,550 SUC</span>
+                    </div>
+                </ul>
+                <button class="submit-btn" id="btn-premium">Loading...</button>
+            </div>
+
+            <div class="plan-card" id="card-vip">
+                <h3 class="plan-title">VIP Plan</h3>
+                <div class="plan-roi">12% <span style="font-size: 16px; color: #a0a5b1;">Monthly</span></div>
+                <ul class="plan-details">
+                    <li>Duration: <strong style="color:#00ff88;">Min 90 Days to Unlimited</strong></li>
+                    <li>Invest Amount: <strong>$5,001 - $10,000</strong></li>
+                    <li style="color: #ff4d4d; font-size: 12px;">Required: Slot 12 OR Activation Fee</li>
+                    <div class="rule-box">
+                        Unlock Fee (If Slots Locked):<br>
+                        <span>$20,475 USDT</span> OR <span class="suc-text">204,750 SUC</span>
+                    </div>
+                </ul>
+                <button class="submit-btn" id="btn-vip">Loading...</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let unlockedSlots = [];
+        let paidUnlockedPlans = []; 
+        let userUSDT = 0;
+        let userSUC = 0;
+        const SUC_PRICE = 0.10; 
+
+        window.onload = function() {
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            unlockedSlots = savedUser.unlockedSlots || [];
+            paidUnlockedPlans = savedUser.paidUnlockedPlans || [];
+            
+            userSUC = savedUser.stsTokens || 0; 
+            userUSDT = savedUser.usdtBalance !== undefined ? savedUser.usdtBalance : 1250.00; 
+
+            document.getElementById('display-usdt').innerHTML = `${userUSDT.toLocaleString('en-US', {minimumFractionDigits: 2})} <span>USDT</span>`;
+            document.getElementById('display-suc').innerHTML = `${userSUC.toLocaleString('en-US', {minimumFractionDigits: 2})} <span>SUC</span>`;
+            
+            setupPlanUI('starter', 'Starter', 3, 100, 100, 35);
+            setupPlanUI('basic', 'Basic', 6, 101, 500, 315);
+            setupPlanUI('premium', 'Premium', 9, 501, 5000, 2555);
+            setupPlanUI('vip', 'VIP', 12, 5001, 10000, 20475);
+        };
+
+        function setupPlanUI(planId, planName, reqSlot, minInvest, maxInvest, unlockFeeUsdt) {
+            let btn = document.getElementById(`btn-${planId}`);
+            let card = document.getElementById(`card-${planId}`);
+            
+            let isUnlocked = unlockedSlots.includes(reqSlot) || paidUnlockedPlans.includes(planName);
+
+            if (isUnlocked) {
+                btn.innerText = `Stake Now ($${minInvest}+)`;
+                btn.className = "submit-btn unlocked-btn";
+                card.classList.remove("locked-plan");
+                card.classList.add("unlocked-plan");
+                
+                btn.onclick = function() { stakeFunds(planName, minInvest, maxInvest); };
+            } else {
+                btn.innerText = `🔓 Unlock Plan for $${unlockFeeUsdt}`;
+                btn.className = "submit-btn locked-btn";
+                card.classList.remove("unlocked-plan");
+                card.classList.add("locked-plan");
+                
+                btn.onclick = function() { payUnlockFee(planName, unlockFeeUsdt, reqSlot); };
+            }
+        }
+
+        function payUnlockFee(planName, feeUsdt, reqSlot) {
+            let feeSuc = feeUsdt / SUC_PRICE;
+
+            let confirmMsg = `🔓 UNLOCK ${planName.toUpperCase()} PLAN 🔓\n\nYou don't have Slot ${reqSlot} active. You can bypass the matrix by paying a 50% Activation Fee:\n\nType '1' to pay ${feeUsdt.toLocaleString()} USDT\nType '2' to pay ${feeSuc.toLocaleString()} SUC Tokens\n\nEnter 1 or 2:`;
+            
+            let paymentChoice = prompt(confirmMsg);
+
+            if (paymentChoice === "1") {
+                if (userUSDT >= feeUsdt) {
+                    userUSDT -= feeUsdt;
+                    processUnlock(planName, feeUsdt, "USDT");
+                } else {
+                    alert(`❌ Insufficient USDT Balance!\nYou need ${feeUsdt.toLocaleString()} USDT.`);
+                }
+            } else if (paymentChoice === "2") {
+                if (userSUC >= feeSuc) {
+                    userSUC -= feeSuc;
+                    processUnlock(planName, feeSuc, "SUC Tokens");
+                } else {
+                    alert(`❌ Insufficient SUC Tokens!\nYou need ${feeSuc.toLocaleString()} SUC.`);
+                }
+            } else if (paymentChoice !== null) {
+                alert("Invalid choice. Please enter 1 or 2.");
+            }
+        }
+
+        function processUnlock(planName, amountPaid, currencyName) {
+            paidUnlockedPlans.push(planName); 
+
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            savedUser.usdtBalance = userUSDT;
+            savedUser.stsTokens = userSUC;
+            savedUser.paidUnlockedPlans = paidUnlockedPlans;
+            localStorage.setItem('stsUser', JSON.stringify(savedUser)); 
+
+            alert(`✅ PLAN UNLOCKED!\n\nYou paid ${amountPaid.toLocaleString()} ${currencyName} as an activation fee.\n\nYou can now stake your actual investment amount!`);
+            window.location.reload(); 
+        }
+
+        function stakeFunds(planName, minAmount, maxAmount) {
+            let inputAmt = prompt(`🚀 STAKE IN ${planName.toUpperCase()} PLAN 🚀\n\nEnter total staking amount ($${minAmount.toLocaleString()} - $${maxAmount.toLocaleString()}):\n\n(Payable in USDT or equivalent SUC Tokens)`);
+            
+            let amount = Number(inputAmt);
+
+            if (amount && amount > 0) {
+                if(amount >= minAmount && amount <= maxAmount) {
+                    
+                    let reqSucAmount = amount / SUC_PRICE;
+                    let payChoice = prompt(`How would you like to pay the $${amount.toLocaleString()} Staking Amount?\n\nType '1' to pay ${amount.toLocaleString()} USDT\nType '2' to pay ${reqSucAmount.toLocaleString()} SUC Tokens\n\nEnter 1 or 2:`);
+
+                    if (payChoice === "1") {
+                        if (userUSDT >= amount) {
+                            userUSDT -= amount;
+                            finalizeStake(planName, amount, "USDT");
+                        } else { alert("❌ Insufficient USDT Balance!"); }
+                    } else if (payChoice === "2") {
+                        if (userSUC >= reqSucAmount) {
+                            userSUC -= reqSucAmount;
+                            finalizeStake(planName, reqSucAmount, "SUC Tokens");
+                        } else { alert("❌ Insufficient SUC Tokens!"); }
+                    }
+
+                } else {
+                    alert(`Error: Staking amount must be between $${minAmount.toLocaleString()} and $${maxAmount.toLocaleString()}.`);
+                }
+            }
+        }
+
+        function finalizeStake(planName, amountPaid, currencyName) {
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+            savedUser.usdtBalance = userUSDT;
+            savedUser.stsTokens = userSUC;
+            localStorage.setItem('stsUser', JSON.stringify(savedUser)); 
+
+            alert(`🎉 STAKING SUCCESSFUL!\n\nYou have successfully staked ${amountPaid.toLocaleString()} ${currencyName} in the ${planName} Plan.\n\nYour ROI will start generating from tomorrow!`);
+            window.location.reload(); 
+        }
+    </script>
+</body>
+</html>

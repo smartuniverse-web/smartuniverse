@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw Funds - Smart Universe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0b0e14; color: #e2e8f0; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .logo { color: #f3ba2f; font-weight: bold; font-size: 20px; }
+        .container { max-width: 500px; margin: 20px auto; padding: 20px; }
+        
+        /* Balance Card */
+        .balance-card { background: linear-gradient(135deg, #151a25, #1a1608); border: 1px solid #f3ba2f; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(243, 186, 47, 0.1); }
+        .balance-card p { color: #a0a5b1; font-size: 14px; margin-bottom: 5px; }
+        .balance-card h2 { font-size: 32px; color: #fff; }
+        .balance-card .inr-val { color: #00ff88; font-weight: bold; margin-top: 5px; }
+
+        /* Method Tabs */
+        .method-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .tab-btn { flex: 1; padding: 12px; border: 1px solid #2a2f3a; background: #151a25; color: #fff; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .tab-btn.active { border-color: #f3ba2f; color: #f3ba2f; background: rgba(243, 186, 47, 0.05); }
+
+        .form-box { background: #151a25; border: 1px solid #2a2f3a; padding: 20px; border-radius: 12px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; color: #a0a5b1; margin-bottom: 8px; }
+        .search-box { position: relative; width: 100%; }
+        .search-box input, select, .custom-input { width: 100%; background: #0b0e14; border: 1px solid #2a2f3a; color: #fff; padding: 12px; border-radius: 8px; outline: none; }
+        
+        /* Sub-methods (INR) */
+        .sub-methods { display: flex; gap: 8px; margin-bottom: 15px; }
+        .sub-btn { flex: 1; padding: 8px; background: #0b0e14; border: 1px solid #2a2f3a; color: #a0a5b1; font-size: 12px; border-radius: 5px; cursor: pointer; }
+        .sub-btn.active { background: #2a2f3a; color: #fff; border-color: #00ff88; }
+
+        .submit-btn { width: 100%; background: #f3ba2f; color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">SMART UNIVERSE</div>
+    <button onclick="window.location.href='dashboard.html'" style="background:none; border:1px solid #2a2f3a; color:#fff; padding:5px 10px; border-radius:5px; cursor:pointer;">Back</button>
+</header>
+
+<div class="container">
+    <div class="balance-card">
+        <p>Total Withdrawable Balance</p>
+        <h2 id="usdt-bal">$0.00</h2>
+        <div class="inr-val" id="inr-bal">≈ ₹0.00</div>
+    </div>
+
+    <div class="method-tabs">
+        <button class="tab-btn active" onclick="switchMethod('crypto')">Crypto / USDT</button>
+        <button class="tab-btn" onclick="switchMethod('inr')">INR (Withdraw)</button>
+    </div>
+
+    <div class="form-box">
+        <div id="crypto-form">
+            <div class="input-group">
+                <label>🔍 Select Asset (Polygon MATIC Network)</label>
+                <div class="search-box">
+                    <select id="asset-select" onchange="updateMinHint()">
+                        <option value="USDT">Tether (USDT)</option>
+                        <option value="SUC">Smart Universe Coin (SUC)</option>
+                        <option value="MATIC">Polygon (MATIC)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Receiver Wallet Address</label>
+                <input type="text" id="crypto-address" placeholder="Paste Polygon 0x... address">
+            </div>
+        </div>
+
+        <div id="inr-form" style="display: none;">
+            <label style="font-size: 13px; color: #a0a5b1; display: block; margin-bottom: 8px;">Withdrawal Channel</label>
+            <div class="sub-methods">
+                <button class="sub-btn active" id="btn-upi" onclick="switchInr('upi')">UPI</button>
+                <button class="sub-btn" id="btn-bank" onclick="switchInr('bank')">Bank Account</button>
+                <button class="sub-btn" id="btn-imps" onclick="switchInr('imps')">IMPS</button>
+            </div>
+
+            <div id="inr-fields">
+                <div class="input-group">
+                    <input type="text" id="inr-main-field" class="custom-input" placeholder="Enter UPI ID (e.g. name@upi)">
+                </div>
+                <div id="bank-fields" style="display: none;">
+                    <div class="input-group"><input type="text" id="bank-name" class="custom-input" placeholder="Bank Name"></div>
+                    <div class="input-group"><input type="text" id="ifsc-code" class="custom-input" placeholder="IFSC Code"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Amount to Withdraw (Min. $10 Value)</label>
+            <input type="number" id="wit-amount" class="custom-input" placeholder="Enter Amount">
+            <small id="min-hint" style="color: #f3ba2f; font-size: 11px; margin-top: 5px; display: block;">Min value required: $10 USDT equivalent</small>
+        </div>
+
+        <button class="submit-btn" onclick="submitWithdraw()">Confirm Withdrawal</button>
+    </div>
+</div>
+
+<script>
+    let currentMethod = 'crypto';
+    let currentInrType = 'upi';
+    let usdtRate = 90; // Fallback rate
+    let userBalance = 0;
+
+    window.onload = function() {
+        let savedUser = JSON.parse(localStorage.getItem('stsUser')) || {};
+        userBalance = savedUser.usdtBalance || 0;
+        
+        // Balance Display
+        document.getElementById('usdt-bal').innerText = `$${userBalance.toFixed(2)}`;
+        document.getElementById('inr-bal').innerText = `≈ ₹${(userBalance * usdtRate).toLocaleString()}`;
+        
+        loadAssetList();
+    };
+
+    function switchMethod(m) {
+        currentMethod = m;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('crypto-form').style.display = m === 'crypto' ? 'block' : 'none';
+        document.getElementById('inr-form').style.display = m === 'inr' ? 'block' : 'none';
+    }
+
+    function switchInr(type) {
+        currentInrType = type;
+        document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + type).classList.add('active');
+        
+        let mainField = document.getElementById('inr-main-field');
+        let bankFields = document.getElementById('bank-fields');
+
+        if(type === 'upi') {
+            mainField.placeholder = "Enter UPI ID (e.g. name@upi)";
+            bankFields.style.display = 'none';
+        } else {
+            mainField.placeholder = "Enter Account Number";
+            bankFields.style.display = 'block';
+        }
+    }
+
+    async function loadAssetList() {
+        // Here we could fetch more Polygon coins from API
+        // For now, let's ensure USDT is always there as requested
+        console.log("Loading Polygon assets...");
+    }
+
+    function submitWithdraw() {
+        let amt = parseFloat(document.getElementById('wit-amount').value);
+        if(!amt || amt <= 0) { alert("Please enter a valid amount!"); return; }
+
+        // Logic to check $10 value
+        // Admin Pannel Connection
+        let requests = JSON.parse(localStorage.getItem('adminPendingWithdrawals')) || [];
+        let user = JSON.parse(localStorage.getItem('stsUser')) || {stsId: "SUC-84920"};
+
+        let details = currentMethod === 'crypto' ? 
+            document.getElementById('crypto-address').value : 
+            document.getElementById('inr-main-field').value;
+
+        requests.push({
+            id: Date.now(),
+            userId: user.stsId,
+            method: currentMethod.toUpperCase(),
+            subMethod: currentMethod === 'inr' ? currentInrType.toUpperCase() : "POLYGON",
+            amount: amt,
+            currency: currentMethod === 'crypto' ? document.getElementById('asset-select').value : "USDT (INR)",
+            address: details,
+            date: new Date().toLocaleString()
+        });
+
+        localStorage.setItem('adminPendingWithdrawals', JSON.stringify(requests));
+        alert("✅ Withdrawal Request Sent to Admin Panel!");
+        window.location.href = "dashboard.html";
+    }
+</script>
+</body>
+</html>

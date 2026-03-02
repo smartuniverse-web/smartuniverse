@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Network - Smart Universe</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .network-alert {
+            background: rgba(0, 255, 136, 0.1); border: 1px dashed #00ff88; padding: 10px; border-radius: 8px;
+            color: #00ff88; font-size: 13px; text-align: center; margin-bottom: 25px; font-weight: bold;
+        }
+        /* हेडर के लिए बेसिक स्टाइल ताकि बटन अच्छा दिखे */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
+        .login-btn { background: transparent; color: #fff; border: 1px solid #2a2f3a; padding: 8px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .login-btn:hover { background: #f3ba2f; color: #000; border-color: #f3ba2f; }
+    </style>
+</head>
+<body style="background-color: #0b0e14; color: #e2e8f0; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
+    <header>
+        <div class="logo" style="display: flex; align-items: center; font-weight: bold; color: #fff; font-size: 18px;">
+            <img src="logo.png" style="height: 35px; margin-right: 10px;" alt="Logo">
+            SMART UNIVERSE 
+            <span style="font-size: 12px; color: #00ff88; font-weight: normal; margin-left: 8px;">(SUC)</span>
+        </div>
+        <div class="auth-buttons">
+            <button class="login-btn" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+        </div>
+    </header>
+
+    <section class="auth-section" style="padding-top: 50px; padding-bottom: 50px; display: flex; justify-content: center;">
+        <div class="deposit-box" style="max-width: 600px; width: 90%; background: #151a25; padding: 30px; border-radius: 12px; border: 1px solid #2a2f3a; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
+            <h2 style="color: #f3ba2f; text-align: center; margin-bottom: 10px;">Refer & Earn (SUC Tokens)</h2>
+            <p style="text-align: center; color: #a0a5b1; margin-bottom: 20px;">Build your team and earn massive SUC Tokens when your downline invests!</p>
+
+            <div class="network-alert">
+                🚀 Applicable on all Investment Plans! Earn instantly in SUC Tokens.
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 30px; background: #0b0e14; padding: 20px; border-radius: 10px; border: 1px solid #2a2f3a;">
+                <div style="text-align: center; width: 50%; border-right: 1px solid #2a2f3a;">
+                    <h3 style="color: #a0a5b1; font-size: 14px; margin-bottom: 5px;">Total Referrals</h3>
+                    <div style="font-size: 28px; color: #fff; font-weight: bold;">0</div>
+                </div>
+                <div style="text-align: center; width: 50%;">
+                    <h3 style="color: #a0a5b1; font-size: 14px; margin-bottom: 5px;">Team Income</h3>
+                    <div style="font-size: 28px; color: #f3ba2f; font-weight: bold;">0 <span style="font-size: 14px;">SUC</span></div>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label style="color: #e2e8f0; font-size: 14px; margin-bottom: 8px; display: block;">Your Unique Referral Link</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="ref-link" readonly style="flex: 1; min-width: 200px; padding: 12px; color: #00ff88; font-weight: bold; background-color: #0b0e14; border: 1px dashed #00ff88; border-radius: 5px; outline: none;">
+                    <button onclick="copyRefLink()" style="background: #f3ba2f; color: #000; border: none; padding: 12px 25px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.3s;">Copy Link</button>
+                </div>
+            </div>
+
+            <h3 style="color: #ffffff; margin-top: 35px; margin-bottom: 15px; font-size: 18px; text-align: center;">Investment Plan Commission</h3>
+            <p style="text-align: center; color: #a0a5b1; font-size: 12px; margin-bottom: 15px;">When your team activates an Investment Plan, you receive the following percentage of their investment directly in SUC Tokens!</p>
+            
+            <ul class="plan-details" style="text-align: left; list-style: none; padding: 20px; margin: 0; background: #0b0e14; border-radius: 10px; border: 1px solid #2a2f3a;">
+                <li style="padding: 10px 0; border-bottom: 1px dashed #2a2f3a;"><span style="color: #f3ba2f; font-weight: bold; font-size: 16px;">Level 1 (Direct Team):</span> <span style="float: right; color: #00ff88; font-weight: bold; font-size: 18px;">75% SUC</span></li>
+                <li style="padding: 10px 0; border-bottom: 1px dashed #2a2f3a;"><span style="color: #f3ba2f; font-weight: bold; font-size: 16px;">Level 2 (Indirect Team):</span> <span style="float: right; color: #00ff88; font-weight: bold; font-size: 18px;">50% SUC</span></li>
+                <li style="padding: 10px 0;"><span style="color: #f3ba2f; font-weight: bold; font-size: 16px;">Level 3 (Global Team):</span> <span style="float: right; color: #00ff88; font-weight: bold; font-size: 18px;">25% SUC</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <script>
+        window.onload = function() {
+            let savedUser = JSON.parse(localStorage.getItem('stsUser')); // DB key same rakhi hai code na toote
+            
+            if (!savedUser) {
+                window.location.href = "login.html";
+                return;
+            }
+            
+            // पुराने STS ID को SUC-ID में बदलकर नया लिंक बनाना
+            let displayId = savedUser.stsId ? savedUser.stsId.replace("STS", "SUC-") : "SUC-000000";
+            let refLink = "https://smartuniverse.live/register?ref=" + displayId;
+            document.getElementById('ref-link').value = refLink;
+        };
+
+        function copyRefLink() {
+            let copyText = document.getElementById("ref-link");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); 
+            navigator.clipboard.writeText(copyText.value);
+            
+            alert("✅ Referral Link Copied!\n\nShare this on WhatsApp or Telegram and earn up to 75% SUC Token Commission on their investments!");
+        }
+    </script>
+</body>
+</html>
