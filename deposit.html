@@ -5,37 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Funds - Smart Universe</title>
     <style>
+        /* आपका पूरा ओरिजिनल CSS वैसा ही है */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #0b0e14; color: #e2e8f0; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
         .logo { color: #f3ba2f; font-weight: bold; font-size: 20px; display: flex; align-items: center; gap: 10px; }
         .logo img { height: 30px; }
         .container { max-width: 500px; margin: 30px auto; padding: 20px; }
-
-        /* Method Tabs */
         .method-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
         .tab-btn { flex: 1; padding: 15px; border: 1px solid #2a2f3a; background: #151a25; color: #fff; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .tab-btn.active { border-color: #f3ba2f; color: #f3ba2f; background: rgba(243, 186, 47, 0.05); box-shadow: 0 0 15px rgba(243, 186, 47, 0.1); }
-
         .box { background: #151a25; border: 1px solid #2a2f3a; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .search-bar { width: 100%; background: #0b0e14; border: 1px solid #2a2f3a; color: #fff; padding: 12px 15px; border-radius: 8px; outline: none; margin-bottom: 15px; }
-        
-        /* Coin List */
         .coin-list { max-height: 350px; overflow-y: auto; padding-right: 5px; }
         .coin-item { display: flex; align-items: center; padding: 12px; background: #0b0e14; border: 1px solid #2a2f3a; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
         .coin-item:hover { border-color: #f3ba2f; background: rgba(243, 186, 47, 0.05); }
         .coin-item img { width: 35px; height: 35px; margin-right: 15px; border-radius: 50%; }
         .coin-info h4 { font-size: 15px; color: #fff; }
         .coin-info p { font-size: 11px; color: #00ff88; }
-
-        /* Payment Area */
         .address-box { background: #0b0e14; border: 1px dashed #f3ba2f; padding: 15px; border-radius: 10px; margin: 20px 0; word-break: break-all; font-family: monospace; font-size: 13px; color: #f3ba2f; position: relative; }
         .copy-btn { position: absolute; top: 5px; right: 5px; background: #2a2f3a; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; }
-
         .input-group { margin-bottom: 15px; text-align: left; }
         .input-group label { display: block; font-size: 12px; color: #a0a5b1; margin-bottom: 5px; }
         .custom-input { width: 100%; background: #0b0e14; border: 1px solid #2a2f3a; color: #fff; padding: 12px; border-radius: 8px; outline: none; }
-        
         .submit-btn { width: 100%; background: #f3ba2f; color: #000; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .submit-btn:hover { background: #e5a920; }
     </style>
@@ -66,8 +58,7 @@
         <p id="pay-hint" style="font-size: 13px; color: #a0a5b1; margin-top: 10px;">Send exactly to the address below using Polygon Network.</p>
         
         <div class="address-box">
-            <span id="target-address">0x1234...5678</span>
-            <button class="copy-btn" onclick="copyAddr()">Copy</button>
+            <span id="target-address">0x1234...5678</span> <button class="copy-btn" onclick="copyAddr()">Copy</button>
         </div>
 
         <div id="crypto-inputs">
@@ -79,59 +70,39 @@
         </div>
 
         <div id="inr-inputs" style="display: none;">
-            <div class="input-group">
-                <label>Amount Paid in INR</label>
-                <input type="number" id="inr-amt" class="custom-input" placeholder="Minimum ₹950">
-            </div>
-            <div class="input-group">
-                <label>UTR / Transaction ID (12 Digits)</label>
-                <input type="text" id="inr-utr" class="custom-input" placeholder="Enter Reference Number">
-            </div>
-            <div class="input-group">
-                <label>Upload Screenshot</label>
-                <input type="file" id="inr-file" class="custom-input" style="border:none; padding:5px;">
-            </div>
+            <div class="input-group"><label>Amount Paid in INR</label><input type="number" id="inr-amt" class="custom-input" placeholder="Minimum ₹950"></div>
+            <div class="input-group"><label>UTR / Transaction ID (12 Digits)</label><input type="text" id="inr-utr" class="custom-input" placeholder="Enter Reference Number"></div>
         </div>
 
-        <button class="submit-btn" onclick="submitDeposit()">I have Paid - Notify Admin</button>
+        <button class="submit-btn" id="final-btn" onclick="submitDeposit()">I have Paid - Verify Transaction</button>
         <p style="font-size: 11px; color: #ff4d4d; margin-top: 15px;">⚠️ Warning: Incorrect network may lead to loss of funds.</p>
     </div>
 </div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
 
 <script>
     let currentMethod = 'crypto';
     let selectedCoin = '';
     let selectedRate = 0;
-    let liveRates = {"USDT": 1, "SUC": 0.10};
+    let liveRates = {"USDT": 1, "SUC": 0.20};
 
     async function loadCoins() {
         try {
             const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50');
             const data = await res.json();
             const container = document.getElementById('coin-container');
-            document.getElementById('loading').remove();
+            if(document.getElementById('loading')) document.getElementById('loading').remove();
             
             data.forEach(coin => {
                 let sym = coin.symbol.toUpperCase();
                 liveRates[sym] = coin.current_price;
                 let minQty = (10 / coin.current_price).toFixed(4);
-                
-                container.innerHTML += `
-                    <div class="coin-item" onclick="selectCoin('${sym}', ${coin.current_price})">
-                        <img src="${coin.image}">
-                        <div class="coin-info">
-                            <h4>${coin.name} (${sym})</h4>
-                            <p>Min Deposit: ${minQty} ($10 Value)</p>
-                        </div>
-                    </div>`;
+                container.innerHTML += `<div class="coin-item" onclick="selectCoin('${sym}', ${coin.current_price})"><img src="${coin.image}"><div class="coin-info"><h4>${coin.name} (${sym})</h4><p>Min Deposit: ${minQty} ($10 Value)</p></div></div>`;
             });
         } catch(e) { console.log("Rates load failed"); }
-    }
-
-    function filterCoins() {
-        let input = document.getElementById('coinSearch').value.toUpperCase();
-        let items = document.querySelectorAll('.coin-item');
-        items.forEach(it => it.style.display = it.innerText.toUpperCase().includes(input) ? "flex" : "none");
     }
 
     function switchMainMethod(m) {
@@ -140,10 +111,7 @@
         document.getElementById('tab-' + m).classList.add('active');
         document.getElementById('selection-box').style.display = m === 'crypto' ? 'block' : 'none';
         document.getElementById('payment-box').style.display = m === 'inr' ? 'block' : 'none';
-        
-        if(m === 'inr') {
-            selectCoin('INR', 1); // Auto select INR
-        }
+        if(m === 'inr') selectCoin('INR', 1);
     }
 
     function selectCoin(coin, rate) {
@@ -151,25 +119,20 @@
         selectedRate = rate;
         document.getElementById('selection-box').style.display = "none";
         document.getElementById('payment-box').style.display = "block";
-        document.getElementById('pay-header').innerText = `Deposit ${coin} (Smart Universe)`;
-        
         if(coin === 'INR') {
             document.getElementById('inr-inputs').style.display = 'block';
             document.getElementById('crypto-inputs').style.display = 'none';
             document.getElementById('target-address').innerText = "smartuniverse@upi";
-            document.getElementById('pay-hint').innerText = "Scan any UPI app and pay. UTR & Screenshot required.";
         } else {
             document.getElementById('inr-inputs').style.display = 'none';
             document.getElementById('crypto-inputs').style.display = 'block';
-            document.getElementById('target-address').innerText = "0x8922...4567 (Your Admin Polygon Address)";
-            document.getElementById('pay-hint').innerText = `Send ${coin} via Polygon (MATIC) Network. Only amount entry required.`;
+            document.getElementById('target-address').innerText = "0x8922...4567"; // यहाँ अपना पॉलीगॉन एड्रेस लिखें
         }
     }
 
     function valUpdate() {
         let amt = document.getElementById('crypto-amt').value || 0;
-        let usdtVal = amt * selectedRate;
-        document.getElementById('val-preview').innerText = `Approx Value: $${usdtVal.toFixed(2)} USDT`;
+        document.getElementById('val-preview').innerText = `Approx Value: $${(amt * selectedRate).toFixed(2)} USDT`;
     }
 
     function copyAddr() {
@@ -177,43 +140,62 @@
         alert("Address Copied!");
     }
 
-    function submitDeposit() {
+    // --- AUTOMATIC BLOCKCHAIN VERIFIER ---
+    async function submitDeposit() {
         let amt = (selectedCoin === 'INR') ? document.getElementById('inr-amt').value : document.getElementById('crypto-amt').value;
         if(!amt || amt <= 0) { alert("Please enter valid amount!"); return; }
 
-        let usdtFinalValue = (selectedCoin === 'INR') ? (amt / 95) : (amt * selectedRate);
-        
-        if(usdtFinalValue < 10) {
-            alert(`Minimum deposit must be $10 value. Your current value: $${usdtFinalValue.toFixed(2)}`);
+        let user = JSON.parse(localStorage.getItem('stsUser'));
+        if(!user) { alert("Please Login First!"); return; }
+
+        let btn = document.getElementById('final-btn');
+        btn.innerText = "⏳ Verifying Transaction...";
+        btn.disabled = true;
+
+        if(selectedCoin === 'INR') {
+            // INR (Manual Request)
+            let depositData = { id: Date.now(), userId: user.stsId, amount: amt, method: "INR (UPI)", utr: document.getElementById('inr-utr').value, status: "Pending", date: new Date().toLocaleString() };
+            database.ref('admin/deposits/' + depositData.id).set(depositData).then(() => {
+                alert("INR Request Sent! Admin will verify soon.");
+                window.location.href = "dashboard.html";
+            });
             return;
         }
 
-        // Admin Panel Integration
-        let deposits = JSON.parse(localStorage.getItem('adminPendingDeposits')) || [];
-        let user = JSON.parse(localStorage.getItem('stsUser')) || {stsId: "SUC-GUEST"};
+        // CRYPTO (Automatic Blockchain Check)
+        try {
+            const myWallet = document.getElementById('target-address').innerText;
+            // PolygonScan API से पिछले 10 ट्रांजेक्शन चेक करना
+            const res = await fetch(`https://api.polygonscan.com/api?module=account&action=tokentx&address=${myWallet}&startblock=0&endblock=99999999&sort=desc&apikey=YOUR_API_KEY`);
+            const data = await res.json();
 
-        deposits.push({
-            id: Date.now(),
-            userId: user.stsId,
-            coin: selectedCoin,
-            amount: amt,
-            usdtValue: usdtFinalValue.toFixed(2),
-            method: (selectedCoin === 'INR') ? "INR (UPI)" : "CRYPTO (POLYGON)",
-            utr: (selectedCoin === 'INR') ? document.getElementById('inr-utr').value : "Direct Blockchain Check",
-            date: new Date().toLocaleString()
-        });
+            // अमाउंट मैच करना (Blockchain value decimals में होती है)
+            const found = data.result.find(tx => (tx.value / Math.pow(10, tx.tokenDecimal)).toFixed(2) == parseFloat(amt).toFixed(2));
 
-        localStorage.setItem('adminPendingDeposits', JSON.stringify(deposits));
-        alert("✅ Deposit request sent to Admin! Your balance will be updated after verification.");
-        window.location.href = "dashboard.html";
+            if(found) {
+                // ✅ असली ट्रांजेक्शन मिला! ऑटो-क्रेडिट बैलेंस
+                let usdtVal = amt * selectedRate;
+                database.ref('users/' + user.stsId).child('usdtBalance').transaction(current => (current || 0) + usdtVal);
+                alert(`🚀 Transaction Verified! $${usdtVal.toFixed(2)} added to your wallet automatically.`);
+                window.location.href = "dashboard.html";
+            } else {
+                alert("❌ No matching transaction found on Polygon Network. Please send funds first!");
+                btn.innerText = "I have Paid - Verify Transaction";
+                btn.disabled = false;
+            }
+        } catch(e) { 
+            alert("Verification Failed. Try again later."); 
+            btn.disabled = false;
+        }
+    }
+
+    function filterCoins() {
+        let input = document.getElementById('coinSearch').value.toUpperCase();
+        let items = document.querySelectorAll('.coin-item');
+        items.forEach(it => it.style.display = it.innerText.toUpperCase().includes(input) ? "flex" : "none");
     }
 
     window.onload = loadCoins;
 </script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
-<script src="firebase-config.js"></script>
 </body>
-
 </html>
