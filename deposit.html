@@ -6,7 +6,7 @@
     <title>Add Funds - Smart Universe</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* आपका पूरा ओरिजिनल CSS (बिना किसी बदलाव के) */
+        /* आपका पूरा ओरिजिनल CSS */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #0b0e14; color: #e2e8f0; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #151a25; border-bottom: 1px solid #2a2f3a; }
@@ -30,8 +30,6 @@
         .input-group label { display: block; font-size: 12px; color: #a0a5b1; margin-bottom: 5px; }
         .custom-input { width: 100%; background: #0b0e14; border: 1px solid #2a2f3a; color: #fff; padding: 12px; border-radius: 8px; outline: none; }
         .submit-btn { width: 100%; background: #f3ba2f; color: #000; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        
-        /* QR Code Container Styling */
         #qrcode { background: #fff; padding: 10px; border-radius: 10px; display: inline-block; margin-bottom: 15px; }
     </style>
 </head>
@@ -58,31 +56,23 @@
 
     <div id="payment-box" class="box" style="display: none; text-align: center;">
         <h3 id="pay-header">Scan to Pay</h3>
-        
-        <div id="qrcode-container" style="margin-top: 20px;">
-            <div id="qrcode"></div>
-        </div>
-
+        <div id="qrcode-container" style="margin-top: 20px;"><div id="qrcode"></div></div>
         <p id="pay-hint" style="font-size: 13px; color: #a0a5b1; margin-bottom: 10px;">Network: Polygon (MATIC)</p>
-        
         <div class="address-box">
             <span id="target-address">0x30eC851Bfb925D207f6Aaf0Cbe82F1c21a6EE9aB</span>
             <button class="copy-btn" onclick="copyAddr()">Copy</button>
         </div>
-
         <div id="crypto-inputs">
             <div class="input-group">
-                <label>Amount Sent (Asset Quantity)</label>
-                <input type="number" id="crypto-amt" class="custom-input" placeholder="Enter amount sent" oninput="valUpdate()">
-                <small id="val-preview" style="color:#00ff88; font-size:11px; margin-top:5px; display:block;">Approx Value: $0.00 USDT</small>
+                <label id="amt-label">Amount Sent</label>
+                <input type="number" id="crypto-amt" class="custom-input" placeholder="0.00" oninput="valUpdate()">
+                <small id="val-preview" style="color:#00ff88; font-size:11px; margin-top:5px; display:block;">Value in USD: $0.00</small>
             </div>
         </div>
-
         <div id="inr-inputs" style="display: none;">
-            <div class="input-group"><label>Amount Paid in INR</label><input type="number" id="inr-amt" class="custom-input" placeholder="Minimum ₹950"></div>
-            <div class="input-group"><label>UTR / Transaction ID</label><input type="text" id="inr-utr" class="custom-input" placeholder="12 Digit Reference"></div>
+            <div class="input-group"><label>Amount Paid (INR)</label><input type="number" id="inr-amt" class="custom-input"></div>
+            <div class="input-group"><label>UTR Number</label><input type="text" id="inr-utr" class="custom-input"></div>
         </div>
-
         <button class="submit-btn" id="final-btn" onclick="submitDeposit()">I have Paid - Verify Now</button>
     </div>
 </div>
@@ -98,41 +88,27 @@
     const myWallet = "0x30eC851Bfb925D207f6Aaf0Cbe82F1c21a6EE9aB";
     const myApiKey = "RDH9ZJJF124IKUZ1E1H89GGSWDJFQ6N738";
 
-    // QR Code Generator
-    let qrcode = new QRCode(document.getElementById("qrcode"), {
-        text: myWallet,
-        width: 150,
-        height: 150,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-    });
+    let qrcode = new QRCode(document.getElementById("qrcode"), { text: myWallet, width: 150, height: 150 });
 
     async function loadCoins() {
+        // MATIC की लाइव प्राइस के लिए API कॉल
         try {
-            // हमने करेंसी लिस्ट को साफ़ कर दिया है ताकि यूज़र सिर्फ Polygon वाले ही देखे
+            const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=polygon-ecosystem-coin&vs_currencies=usd');
+            const data = await res.json();
+            const maticPrice = data['polygon-ecosystem-coin'].usd;
+
             const coins = [
                 {name: "USDT (Polygon)", sym: "USDT", img: "https://cryptologos.cc/logos/tether-usdt-logo.png", price: 1},
-                {name: "MATIC (Native)", sym: "MATIC", img: "https://cryptologos.cc/logos/polygon-matic-logo.png", price: 0.40},
-                {name: "USD Coin (PoS)", sym: "USDC", img: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png", price: 1}
+                {name: "MATIC (Native)", sym: "MATIC", img: "https://cryptologos.cc/logos/polygon-matic-logo.png", price: maticPrice},
+                {name: "USD Coin", sym: "USDC", img: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png", price: 1}
             ];
             
             const container = document.getElementById('coin-container');
             if(document.getElementById('loading')) document.getElementById('loading').remove();
-            
             coins.forEach(coin => {
-                container.innerHTML += `<div class="coin-item" onclick="selectCoin('${coin.sym}', ${coin.price})"><img src="${coin.img}"><div class="coin-info"><h4>${coin.name}</h4><p>Min: $10 Value</p></div></div>`;
+                container.innerHTML += `<div class="coin-item" onclick="selectCoin('${coin.sym}', ${coin.price})"><img src="${coin.img}"><div class="coin-info"><h4>${coin.name}</h4><p>Price: $${coin.price.toFixed(2)}</p></div></div>`;
             });
-        } catch(e) { console.log("Load Failed"); }
-    }
-
-    function switchMainMethod(m) {
-        currentMethod = m;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-' + m).classList.add('active');
-        document.getElementById('selection-box').style.display = m === 'crypto' ? 'block' : 'none';
-        document.getElementById('payment-box').style.display = m === 'inr' ? 'block' : 'none';
-        if(m === 'inr') selectCoin('INR', 1);
+        } catch(e) { console.log("Price fetch error"); }
     }
 
     function selectCoin(coin, rate) {
@@ -140,66 +116,60 @@
         selectedRate = rate;
         document.getElementById('selection-box').style.display = "none";
         document.getElementById('payment-box').style.display = "block";
-        if(coin === 'INR') {
-            document.getElementById('inr-inputs').style.display = 'block';
-            document.getElementById('crypto-inputs').style.display = 'none';
-            document.getElementById('qrcode-container').style.display = 'none';
-            document.getElementById('target-address').innerText = "smartuniverse@upi";
-        } else {
-            document.getElementById('inr-inputs').style.display = 'none';
-            document.getElementById('crypto-inputs').style.display = 'block';
-            document.getElementById('qrcode-container').style.display = 'block';
-            document.getElementById('target-address').innerText = myWallet;
-        }
+        document.getElementById('amt-label').innerText = `Amount of ${coin} Sent`;
     }
 
     function valUpdate() {
         let amt = document.getElementById('crypto-amt').value || 0;
-        document.getElementById('val-preview').innerText = `Approx Value: $${(amt * selectedRate).toFixed(2)} USDT`;
-    }
-
-    function copyAddr() {
-        navigator.clipboard.writeText(document.getElementById('target-address').innerText);
-        alert("Copied!");
+        document.getElementById('val-preview').innerText = `Value in USD: $${(amt * selectedRate).toFixed(2)}`;
     }
 
     async function submitDeposit() {
         let amt = (selectedCoin === 'INR') ? document.getElementById('inr-amt').value : document.getElementById('crypto-amt').value;
-        if(!amt || amt <= 0) { alert("Enter amount!"); return; }
+        if(!amt || amt <= 0) { alert("Please enter amount!"); return; }
 
         let user = JSON.parse(localStorage.getItem('stsUser'));
         let btn = document.getElementById('final-btn');
-        btn.innerText = "⏳ Verifying...";
+        btn.innerText = "⏳ Scanning Blockchain...";
         btn.disabled = true;
 
-        if(selectedCoin === 'INR') {
-            database.ref('admin/deposits/').push({ userId: user.stsId, amount: amt, method: "INR", utr: document.getElementById('inr-utr').value, status: "Pending" });
-            alert("INR Request Sent!"); window.location.href = "dashboard.html"; return;
-        }
-
         try {
-            const res = await fetch(`https://api.polygonscan.com/api?module=account&action=tokentx&address=${myWallet}&startblock=0&endblock=99999999&sort=desc&apikey=${myApiKey}`);
+            // MATIC के लिए अलग API और Tokens (USDT/USDC) के लिए अलग API
+            let action = (selectedCoin === "MATIC") ? "txlist" : "tokentx";
+            const url = `https://api-polygon.etherscan.io/api?module=account&action=${action}&address=${myWallet}&startblock=0&endblock=99999999&sort=desc&apikey=${myApiKey}`;
+            
+            const res = await fetch(url);
             const data = await res.json();
-            const found = data.result.find(tx => (tx.value / Math.pow(10, tx.tokenDecimal)).toFixed(2) == parseFloat(amt).toFixed(2));
+
+            // ब्लॉकचेन पर ट्रांजेक्शन ढूँढना
+            const found = data.result.find(tx => {
+                let txValue = (tx.value / Math.pow(10, (tx.tokenDecimal || 18))).toFixed(2);
+                return txValue == parseFloat(amt).toFixed(2) && tx.to.toLowerCase() === myWallet.toLowerCase();
+            });
 
             if(found) {
-                let usdtAdd = amt * selectedRate;
-                database.ref('users/' + user.stsId).child('usdtBalance').transaction(c => (c || 0) + usdtAdd);
-                alert(`🚀 Verified! $${usdtAdd.toFixed(2)} added!`);
+                let usdToAdd = parseFloat(amt) * selectedRate;
+                // Firebase में बैलेंस अपडेट करना
+                database.ref('users/' + user.stsId).child('usdtBalance').transaction(c => (c || 0) + usdToAdd);
+                alert("🚀 Success! Payment Found. Balance Updated.");
                 window.location.href = "dashboard.html";
             } else {
-                alert("❌ No matching transaction found. Please wait 1 minute.");
-                btn.innerText = "I have Paid - Verify Now"; btn.disabled = false;
+                alert("❌ Transaction not found. Make sure you sent the exact amount and wait 1-2 minutes.");
+                btn.innerText = "Verify Again"; btn.disabled = false;
             }
-        } catch(e) { alert("Error. Try again."); btn.disabled = false; }
+        } catch(e) {
+            alert("Verification Error. Please try again.");
+            btn.disabled = false;
+        }
     }
 
-    function filterCoins() {
-        let input = document.getElementById('coinSearch').value.toUpperCase();
-        let items = document.querySelectorAll('.coin-item');
-        items.forEach(it => it.style.display = it.innerText.toUpperCase().includes(input) ? "flex" : "none");
+    function switchMainMethod(m) {
+        document.getElementById('selection-box').style.display = m === 'crypto' ? 'block' : 'none';
+        document.getElementById('payment-box').style.display = m === 'inr' ? 'block' : 'none';
+        if(m === 'inr') { selectedCoin = 'INR'; document.getElementById('qrcode-container').style.display='none'; }
     }
 
+    function copyAddr() { navigator.clipboard.writeText(myWallet); alert("Copied!"); }
     window.onload = loadCoins;
 </script>
 </body>
